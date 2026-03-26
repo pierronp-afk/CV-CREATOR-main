@@ -10,6 +10,20 @@ import {
   Undo2, Columns2, Rows2, AlignLeft, AlignCenter, AlignRight, AlignJustify
 } from 'lucide-react';
 
+import { 
+  formatTextForPreview, 
+  paginateExperiences, 
+  handleImageError 
+} from './utils/cv';
+
+import A4Page from './components/cv/A4Page';
+import CornerTriangle from './components/cv/CornerTriangle';
+import PageCompetences from './components/cv/PageCompetences';
+
+import HeaderSmall from './components/ui/HeaderSmall';
+import Footer from './components/ui/Footer';
+import HexagonRating from './components/ui/HexagonRating';
+
 // --- CONFIGURATION & THÈME ---
 const THEME = {
   primary: "#2E86C1", 
@@ -66,53 +80,7 @@ const DEFAULT_CV_DATA = {
   }
 };
 
-// --- HELPERS ---
-const formatTextForPreview = (text, withQuotes = false) => {
-  if (!text) return "";
-  let content = String(text);
-
-  // Si des guillemets sont demandés, on les injecte intelligemment
-  if (withQuotes) {
-    // Si le texte contient une balise div d'alignement, on injecte les guillemets à l'intérieur
-    if (content.includes('<div class="text-')) {
-      content = content.replace(/(<div class="text-(?:left|center|right|justify)">)/g, '$1"')
-                       .replace(/(<\/div>)$/g, '"$1');
-    } else {
-      content = `"${content}"`;
-    }
-  }
-
-  return content
-    .replace(/</g, "&lt;").replace(/>/g, "&gt;") 
-    .replace(/&lt;b&gt;/g, "<b>").replace(/&lt;\/b&gt;/g, "</b>") 
-    // Autorise les div d'alignement
-    .replace(/&lt;div class="text-(left|center|right|justify)"&gt;\n?/g, '<div class="text-$1">')
-    .replace(/\n?&lt;\/div&gt;/g, "</div>")
-    .replace(/\n/g, "<br/>"); 
-};
-
-const paginateExperiences = (experiences) => {
-  if (!Array.isArray(experiences)) return [];
-  const pages = [];
-  let currentPage = [];
-  experiences.forEach((exp) => {
-    if (exp.forceNewPage && currentPage.length > 0) {
-      pages.push(currentPage);
-      currentPage = [exp];
-    } else if (currentPage.length === 2) {
-      pages.push(currentPage);
-      currentPage = [exp];
-    } else {
-      currentPage.push(exp);
-    }
-  });
-  if (currentPage.length > 0) pages.push(currentPage);
-  return pages;
-};
-
-const handleImageError = (e) => {
-  e.target.style.display = 'none';
-};
+// (Utils moved to src/utils/cv.js)
 
 // --- SOUS-COMPOSANTS UI ---
 
@@ -134,57 +102,7 @@ const ModalUI = ({ title, children, onClose, onConfirm, confirmText = "Confirmer
   </div>
 );
 
-const A4Page = ({ children, className = "" }) => (
-  <div className={`A4-page bg-white relative overflow-hidden mx-auto shadow-2xl flex-shrink-0 mb-10 ${className}`} style={{ width: '210mm', height: '297mm', display: 'flex', flexDirection: 'column' }}>
-    {children}
-  </div>
-);
-
-const CornerTriangle = ({ customLogo }) => (
-  <div className="absolute top-0 left-0 w-[170px] h-[170px] z-50 pointer-events-none print:w-[150px] print:h-[150px]">
-    <div className="absolute top-0 left-0 w-full h-full bg-[#2E86C1] triangle-bg" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}></div>
-    {customLogo && customLogo !== "null" && (
-      <div className="absolute top-[12px] left-[12px] w-[100px] h-[100px] flex items-center justify-center">
-          <img src={customLogo} onError={handleImageError} className="max-w-full max-h-full object-contain brightness-0 invert" style={{ transform: 'rotate(-45deg)' }} alt="Logo" />
-      </div>
-    )}
-  </div>
-);
-
-const HeaderSmall = ({ isAnonymous, profile, role, logo }) => {
-  const nameDisplay = isAnonymous 
-    ? `${profile.firstname?.[0] || ''}${profile.lastname?.substring(0, 2) || ''}` 
-    : `${profile.firstname} ${profile.lastname}`;
-    
-  return (
-    <div className="flex justify-between items-start border-b-2 border-[#2E86C1] pb-4 pt-6 px-12 flex-shrink-0 text-left">
-      <div className="w-12 h-12 flex items-center justify-center text-left">
-          {logo && logo !== "null" && <img src={logo} onError={handleImageError} className="max-w-full max-h-full object-contain brightness-0 invert" alt="Logo" />}
-      </div>
-      <div className="text-right">
-        <h3 className="text-sm font-bold text-[#333333] uppercase">{String(nameDisplay)}</h3>
-        <p className="text-[10px] font-bold text-[#999999] uppercase">{String(role || '')}</p>
-      </div>
-    </div>
-  );
-};
-
-const Footer = () => (
-  <div className="absolute bottom-8 left-12 right-12 border-t border-slate-100 pt-4 flex justify-between items-center bg-white flex-shrink-0 text-[8px] font-bold">
-    <div className="text-[#999999] uppercase tracking-widest text-left">Smile - IT is Open <span className="text-[#2E86C1] ml-1">CRÉATEUR D'EXPÉRIENCE DIGITALE OUVERTE</span></div>
-    <div className="text-[#333333]">#MadeWithSmile</div>
-  </div>
-);
-
-const HexagonRating = ({ score, onChange }) => (
-  <div className="flex gap-1">
-    {[1, 2, 3, 4, 5].map((i) => (
-      <svg key={i} viewBox="0 0 100 100" onClick={onChange ? () => onChange(i) : undefined} className={`w-3 h-3 ${onChange ? 'cursor-pointer hover:scale-125 transition-transform' : ''} ${i <= score ? 'text-[#2E86C1] fill-current hexagon-fill' : 'text-slate-200 fill-current'}`}>
-        <polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" />
-      </svg>
-    ))}
-  </div>
-);
+// (A4Page, CornerTriangle, HeaderSmall, Footer, HexagonRating moved to separate files)
 
 const ExperienceItem = ({ exp }) => {
   // Helper pour vérifier si une chaîne formatée (pouvant contenir des tags HTML vides) est réellement remplie
@@ -831,38 +749,7 @@ Texte : ${rawText}`;
       printWindow.document.close();
   };
 
-  // --- RENDU DES PAGES POUR L'APERÇU ---
-  // On définit les composants de rendu de page à l'intérieur d'App pour accéder aux calculs de pagination
-  const PageCompetences = () => (
-    <A4Page>
-      <CornerTriangle customLogo={cvData.smileLogo} />
-      <HeaderSmall isAnonymous={cvData.isAnonymous} profile={cvData.profile} role={cvData.profile.current_role} logo={cvData.smileLogo} />
-      <div className="grid grid-cols-12 gap-10 mt-8 h-full px-12 flex-1 pb-32 overflow-hidden print:overflow-visible text-left">
-          <div className="col-span-5 border-r border-slate-100 pr-8 text-left">
-            <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-8 flex items-center gap-2 text-left"><Cpu size={20}/> Mes Compétences</h3>
-            <div className="space-y-8 text-left">{Object.entries(cvData.skills_categories || {}).map(([cat, skills]) => (<div key={cat}><h4 className="text-[10px] font-bold text-[#999999] uppercase tracking-widest border-b border-slate-100 pb-2 mb-3 text-left">{String(cat)}</h4><div className="space-y-3 text-left">{(skills || []).map((skill, i) => (<div key={i} className="flex items-center justify-between text-left"><span className="text-xs font-bold text-[#333333] uppercase text-left">{String(skill.name)}</span><HexagonRating score={skill.rating} /></div>))}</div></div>))}</div>
-          </div>
-          <div className="col-span-7 flex flex-col gap-10 text-left">
-            {cvData.showSecteur && (cvData.connaissances_sectorielles || []).length > 0 && (<section className="text-left"><h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2 text-left"><Factory size={20}/> Connaissances Sectorielles</h3><div className="flex flex-wrap gap-2 text-left">{(cvData.connaissances_sectorielles || []).map((s, i) => (<span key={i} className="border-2 border-[#2E86C1] text-[#2E86C1] text-[10px] font-black px-3 py-1 rounded uppercase tracking-wider text-left">{String(s)}</span>))}</div></section>)}
-            {cvData.showCertif && (cvData.certifications || []).length > 0 && (
-              <section className="text-left">
-                <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2 text-left"><Award size={20}/> Certifications</h3>
-                <div className="grid grid-cols-2 gap-4 text-left">
-                  {cvData.certifications.map((c, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-slate-50 p-2 rounded text-left">
-                      {c.logo && c.logo !== "null" && <img src={c.logo} onError={handleImageError} className="w-8 h-8 object-contain" alt={String(c.name)} />}
-                      <span className="text-[10px] font-bold text-slate-700 uppercase leading-tight text-left">{String(c.name)}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-            <section className="text-left"><h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-6 flex items-center gap-2 text-left"><GraduationCap size={20}/> Ma Formation</h3><div className="space-y-4 text-left">{(cvData.education || []).map((edu, i) => (<div key={i} className="border-l-2 border-slate-100 pl-4 text-left"><span className="text-[10px] font-bold text-[#999999] block mb-1 text-left">{String(edu.year)}</span><h4 className="text-xs font-bold text-[#333333] uppercase leading-tight text-left">{String(edu.degree)}</h4><span className="text-[9px] text-[#2E86C1] font-medium uppercase text-left">{String(edu.location)}</span></div>))}</div></section>
-          </div>
-      </div>
-      <Footer />
-    </A4Page>
-  );
+  // (PageCompetences component definitions removed from App.jsx as they're now in separate files)
 
   const PagesExperiences = () => (
     <>
@@ -1373,11 +1260,11 @@ Texte : ${rawText}`;
             {cvData.swapPages ? (
               <>
                 <PagesExperiences />
-                <PageCompetences />
+                <PageCompetences cvData={cvData} />
               </>
             ) : (
               <>
-                <PageCompetences />
+                <PageCompetences cvData={cvData} />
                 <PagesExperiences />
               </>
             )}
