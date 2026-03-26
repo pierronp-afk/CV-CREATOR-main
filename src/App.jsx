@@ -23,6 +23,9 @@ import PageCompetences from './components/cv/PageCompetences';
 import HeaderSmall from './components/ui/HeaderSmall';
 import Footer from './components/ui/Footer';
 import HexagonRating from './components/ui/HexagonRating';
+import ModalUI from './components/ui/ModalUI';
+
+import PagesExperiences from './components/cv/PagesExperiences';
 
 // --- CONFIGURATION & THÈME ---
 const THEME = {
@@ -84,88 +87,11 @@ const DEFAULT_CV_DATA = {
 
 // --- SOUS-COMPOSANTS UI ---
 
-const ModalUI = ({ title, children, onClose, onConfirm, confirmText = "Confirmer", icon = <AlertCircle size={32} />, danger = true }) => (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 text-left">
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 text-left">
-      <div className="p-6 text-left">
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${danger ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-[#2E86C1]'}`}>
-          {icon}
-        </div>
-        <h3 className="text-xl font-bold text-slate-900 mb-2 text-center">{String(title)}</h3>
-        <div className="text-sm text-slate-500 mb-8 text-left">{children}</div>
-        <div className="flex gap-3">
-          {onClose && <button onClick={onClose} className="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-colors">Annuler</button>}
-          <button onClick={onConfirm} className={`flex-1 px-4 py-3 text-white rounded-xl font-bold shadow-lg transition-colors ${danger ? 'bg-red-500 hover:bg-red-600 shadow-red-200' : 'bg-[#2E86C1] hover:bg-[#2573a7] shadow-blue-200'}`}>{confirmText}</button>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+// (ModalUI moved to separate file)
 
 // (A4Page, CornerTriangle, HeaderSmall, Footer, HexagonRating moved to separate files)
 
-const ExperienceItem = ({ exp }) => {
-  // Helper pour vérifier si une chaîne formatée (pouvant contenir des tags HTML vides) est réellement remplie
-  const isContentEmpty = (text) => {
-    if (!text) return true;
-    const cleanText = text.replace(/<[^>]*>/g, '').trim();
-    return cleanText === "";
-  };
-
-  const hasContext = !isContentEmpty(exp.context);
-  const hasPhases = !isContentEmpty(exp.phases);
-  const hasTech = exp.tech_stack && Array.isArray(exp.tech_stack) && exp.tech_stack.filter(t => t && t.trim() !== "").length > 0;
-
-  return (
-    <div className="grid grid-cols-12 gap-6 mb-8 break-inside-avoid print:break-inside-avoid text-left">
-      <div className="col-span-2 flex flex-col items-center pt-2 text-left">
-        <div className="w-16 h-16 rounded-lg border border-slate-200 overflow-hidden flex items-center justify-center bg-white mb-2 p-1 text-center">
-          {exp.client_logo && exp.client_logo !== "null" ? (
-            <img src={exp.client_logo} onError={handleImageError} className="max-w-full max-h-full object-contain" alt="Logo Client" />
-          ) : (
-            <span className="text-[8px] font-black text-[#2E86C1] uppercase leading-tight px-1 break-words">
-              {String(exp.client_name || '')}
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="col-span-10 border-l border-slate-100 pl-6 pb-4 text-left">
-        <div className="flex justify-between items-baseline mb-3">
-           <h4 className="text-lg font-bold text-[#333333] uppercase">{String(exp.client_name || '')} <span className="font-normal text-[#666666]">| {String(exp.role || '')}</span></h4>
-           <span className="text-xs font-bold text-[#2E86C1] uppercase">{String(exp.period || '')}</span>
-        </div>
-        
-        {hasContext && (
-          <div className="mb-4 text-left">
-             <h5 className="text-[10px] font-bold text-[#2E86C1] uppercase mb-1">Contexte</h5>
-             <div className="text-sm text-[#333333] leading-relaxed break-words text-justify" dangerouslySetInnerHTML={{__html: formatTextForPreview(exp.context)}}></div>
-          </div>
-        )}
-
-        {(hasPhases || hasTech) && (
-          <div className="mt-4 pt-4 border-t border-slate-50 space-y-4 text-left">
-             {hasPhases && (
-               <div className="text-left">
-                  <h5 className="text-[10px] font-bold text-[#999999] uppercase mb-1">Réalisation</h5>
-                  <div className="text-xs font-medium text-[#333333] break-words text-justify" dangerouslySetInnerHTML={{__html: formatTextForPreview(exp.phases)}}></div>
-               </div>
-             )}
-             {hasTech && (
-               <div className="text-left">
-                  <h5 className="text-[10px] font-bold text-[#999999] uppercase mb-1">Environnement</h5>
-                  <div className="flex flex-wrap gap-1 text-left">
-                    {exp.tech_stack.filter(t => t && t.trim() !== "").map((t, i) => (
-                      <span key={i} className="text-xs font-bold text-[#2E86C1] bg-blue-50 px-2 py-0.5 rounded">{String(t)}</span>
-                    ))}
-                  </div>
-               </div>
-             )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+// (ExperienceItem moved to separate file)
 
 // --- COMPOSANTS UI FORMULAIRE ---
 
@@ -751,26 +677,7 @@ Texte : ${rawText}`;
 
   // (PageCompetences component definitions removed from App.jsx as they're now in separate files)
 
-  const PagesExperiences = () => (
-    <>
-      {experiencePages.map((chunk, pageIndex) => (
-        <A4Page key={pageIndex}>
-          <CornerTriangle customLogo={cvData.smileLogo} />
-          <HeaderSmall isAnonymous={cvData.isAnonymous} profile={cvData.profile} role={cvData.profile.current_role} logo={cvData.smileLogo} />
-          <div className="flex justify-between items-end border-b border-slate-200 pb-2 mb-8 mt-8 px-12 flex-shrink-0 text-left">
-            <h3 className="text-xl font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat">
-              {pageIndex === 0 ? "Mes dernières expériences" : "Expériences (Suite)"}
-            </h3>
-            <span className="text-[10px] font-bold text-[#666666] uppercase text-left">Références</span>
-          </div>
-          <div className="flex-1 px-12 pb-32 overflow-hidden print:overflow-visible text-left">
-            {chunk.map((exp) => (<ExperienceItem key={exp.id} exp={exp} />))}
-          </div>
-          <Footer />
-        </A4Page>
-      ))}
-    </>
-  );
+  // (PagesExperiences component definition removed from App.jsx as it's now in separate file)
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row h-screen overflow-hidden font-sans text-left">
@@ -1259,13 +1166,13 @@ Texte : ${rawText}`;
             {/* RENDU DYNAMIQUE SELON L'ORDRE CHOISI */}
             {cvData.swapPages ? (
               <>
-                <PagesExperiences />
+                <PagesExperiences cvData={cvData} experiencePages={experiencePages} />
                 <PageCompetences cvData={cvData} />
               </>
             ) : (
               <>
                 <PageCompetences cvData={cvData} />
-                <PagesExperiences />
+                <PagesExperiences cvData={cvData} experiencePages={experiencePages} />
               </>
             )}
 
