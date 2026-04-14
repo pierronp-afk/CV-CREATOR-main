@@ -105,10 +105,6 @@ export default function App() {
     moveItem,
     history,
   } = useCvData();
-    purgeData();
-    setShowPurgeConfirm(false);
-    setShowPrivacyNotice(true); 
-  };
 
   const downloadJSON = () => { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cvData)); a.download = `${getFilenameBase()}.json`; a.click(); };
   
