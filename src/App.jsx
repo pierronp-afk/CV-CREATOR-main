@@ -27,6 +27,7 @@ import HeaderSmall from './components/ui/HeaderSmall';
 import Footer from './components/ui/Footer';
 import HexagonRating from './components/ui/HexagonRating';
 import ModalUI from './components/ui/ModalUI';
+import PreviewErrorBoundary from './components/ui/PreviewErrorBoundary';
 import { ButtonUI, InputUI, RichTextareaUI, DropZoneUI, LogoSelectorUI } from './components/ui/FormUI';
 
 import PagesExperiences from './components/cv/PagesExperiences';
@@ -795,6 +796,7 @@ export default function App() {
             className="print-container block origin-top transition-transform duration-300 text-left" 
             style={{ transform: `scale(${zoom})`, height: `${scaledContentHeight}px`, width: `${210 * zoom}mm`, minHeight: 'max-content' }}
           >
+            <PreviewErrorBoundary>
             {/* PAGE 1 : PROFIL (Toujours en premier) */}
             <A4Page>
               <CornerTriangle customLogo={cvData.smileLogo} />
@@ -852,6 +854,7 @@ export default function App() {
                 <PagesExperiences cvData={cvData} experiencePages={experiencePages} />
               </>
             )}
+            </PreviewErrorBoundary>
 
           </div>
         </div>
