@@ -106,6 +106,104 @@ export default function App() {
     history,
   } = useCvData();
 
+  // --- CALCULS DU DOCUMENT ---
+  const experiencePages = paginateExperiences(cvData.experiences);
+  const totalPagesCount = 2 + experiencePages.length; 
+  const scaledContentHeight = (totalPagesCount * 1122.5 * zoom) + ((totalPagesCount - 1) * 40 * zoom);
+
+  useEffect(() => {
+    const accepted = localStorage.getItem('smile_cv_privacy_accepted');
+    if (!accepted) {
+      setShowPrivacyNotice(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    script.onload = () => { 
+      if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; 
+      }
+    };
+    document.head.appendChild(script);
+  }, []);
+
+  const getFilenameBase = () => {
+    const year = new Date().getFullYear();
+    if (cvData.isAnonymous) return `CV_Anonyme_${year}`;
+    const clean = (str) => String(str || "").replace(/[^a-z0-9]/gi, '_').toUpperCase();
+    return `CV ${year} - ${clean(cvData.profile.lastname)} - ${clean(cvData.profile.firstname)}`;
+  };
+
+  useEffect(() => { document.title = getFilenameBase(); }, [cvData.profile, cvData.isAnonymous]);
+
+  const extractTextFromPDF = async (file) => {
+    if (!window.pdfjsLib) {
+      throw new Error("La bibliothèque PDF n'est pas encore prête. Réessayez dans un instant.");
+    }
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+    let fullText = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => item.str).join(" ");
+      fullText += pageText + "\n";
+    }
+    return fullText;
+  };
+
+  const handlePDFImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPendingFile(file);
+    setShowAIConsent(true);
+    e.target.value = null; 
+  };
+
+  const confirmAIAnalysis = async () => {
+    if (!pendingFile) return;
+    setShowAIConsent(false);
+    setIsImporting(true);
+    setImportError(null);
+    try {
+      let rawText = await extractTextFromPDF(pendingFile);
+      rawText = rawText.replace(/\s+/g, ' ').trim().substring(0, 15000);
+      
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: rawText })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Erreur lors de l'analyse");
+      }
+
+      const result = await response.json();
+      
+      updateCvData(prev => ({
+        ...prev,
+        ...result,
+        profile: { ...prev.profile, ...result.profile },
+        experiences: (result.experiences || []).map((exp, idx) => ({ 
+          ...exp, 
+          id: Date.now() + idx, 
+          client_logo: null,
+          forceNewPage: false 
+        }))
+      }));
+    } catch (err) {
+      console.error("Détails de l'erreur d'import:", err);
+      setImportError(err.message || "Erreur lors de l'analyse IA.");
+    } finally {
+      setIsImporting(false);
+      setPendingFile(null);
+    }
+  };
+
   const downloadJSON = () => { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cvData)); a.download = `${getFilenameBase()}.json`; a.click(); };
   
   const uploadJSON = (e) => {
