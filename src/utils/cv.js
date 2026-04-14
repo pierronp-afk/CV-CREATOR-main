@@ -53,3 +53,49 @@ export const paginateExperiences = (experiences) => {
 export const handleImageError = (e) => {
   e.target.style.display = 'none';
 };
+
+/**
+ * Initial empty CV data structure.
+ */
+export const DEFAULT_CV_DATA = {
+  isAnonymous: false,
+  showSecteur: true,
+  showCertif: true,
+  swapPages: false, // false: Compétences en p2 | true: Expériences en p2
+  smileLogo: null, 
+  profile: {
+    firstname: "Prénom",
+    lastname: "NOM",
+    years_experience: "5",
+    current_role: "Poste de Consultant",
+    main_tech: "Techno principale",
+    summary: "Forte expérience en gestion de projet Drupal et dans l'accompagnement de nos clients.",
+    photo: null, 
+    tech_logos: [
+      { type: 'url', src: 'https://cdn.simpleicons.org/php', name: 'PHP' },
+      { type: 'url', src: 'https://cdn.simpleicons.org/drupal', name: 'Drupal' },
+      { type: 'url', src: 'https://cdn.simpleicons.org/symfony', name: 'Symfony' }
+    ]
+  },
+  soft_skills: ["Agilité", "Rigueur", "Communication"],
+  connaissances_sectorielles: ["Industrie", "E-commerce"],
+  certifications: [{ name: "Drupal certified", logo: "https://cdn.simpleicons.org/drupal" }],
+  experiences: [
+    {
+      id: 1,
+      client_name: "Disney",
+      client_logo: "https://logo.clearbit.com/disney.com",
+      period: "Jan 2023 - Présent",
+      role: "Développeur Frontend",
+      context: "Projet de refonte globale du site consommateur.",
+      phases: "• Conception\n• Développement",
+      tech_stack: ["Drupal", "Twig"],
+      forceNewPage: false
+    }
+  ],
+  education: [{ year: "2008/2010", degree: "Master Miage", location: "Orléans" }],
+  skills_categories: {
+    "Langages": [{ name: "JAVA", rating: 4 }, { name: "PHP", rating: 5 }],
+    "Outils": [{ name: "Jira", rating: 5 }]
+  }
+};

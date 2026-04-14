@@ -7,14 +7,17 @@ import {
   Bold, List, Copy, HelpCircle, RefreshCw, Cloud, Mail, Printer,
   ChevronUp, ChevronDown, Award, Factory, ToggleLeft, ToggleRight, FilePlus,
   FileSearch, Loader2, Lock, Sparkles, AlertCircle, LifeBuoy, GripVertical,
-  Undo2, Columns2, Rows2, AlignLeft, AlignCenter, AlignRight, AlignJustify
+  Undo2, AlignLeft, AlignCenter, AlignRight, AlignJustify
 } from 'lucide-react';
 
 import { 
   formatTextForPreview, 
   paginateExperiences, 
-  handleImageError 
+  handleImageError,
+  DEFAULT_CV_DATA
 } from './utils/cv';
+
+import { useCvData } from './hooks/useCvData';
 
 import A4Page from './components/cv/A4Page';
 import CornerTriangle from './components/cv/CornerTriangle';
@@ -24,6 +27,7 @@ import HeaderSmall from './components/ui/HeaderSmall';
 import Footer from './components/ui/Footer';
 import HexagonRating from './components/ui/HexagonRating';
 import ModalUI from './components/ui/ModalUI';
+import { ButtonUI, InputUI, RichTextareaUI, DropZoneUI, LogoSelectorUI } from './components/ui/FormUI';
 
 import PagesExperiences from './components/cv/PagesExperiences';
 
@@ -40,48 +44,7 @@ const getIconUrl = (slug) => `https://cdn.simpleicons.org/${String(slug || '').t
 const getClearbitUrl = (domain) => `https://logo.clearbit.com/${String(domain || '').trim()}`;
 
 // --- DONNÉES PAR DÉFAUT ---
-const DEFAULT_CV_DATA = {
-  isAnonymous: false,
-  showSecteur: true,
-  showCertif: true,
-  swapPages: false, // false: Compétences en p2 | true: Expériences en p2
-  smileLogo: null, 
-  profile: {
-    firstname: "Prénom",
-    lastname: "NOM",
-    years_experience: "5",
-    current_role: "Poste de Consultant",
-    main_tech: "Techno principale",
-    summary: "Forte expérience en gestion de projet Drupal et dans l'accompagnement de nos clients.",
-    photo: null, 
-    tech_logos: [
-      { type: 'url', src: 'https://cdn.simpleicons.org/php', name: 'PHP' },
-      { type: 'url', src: 'https://cdn.simpleicons.org/drupal', name: 'Drupal' },
-      { type: 'url', src: 'https://cdn.simpleicons.org/symfony', name: 'Symfony' }
-    ]
-  },
-  soft_skills: ["Agilité", "Rigueur", "Communication"],
-  connaissances_sectorielles: ["Industrie", "E-commerce"],
-  certifications: [{ name: "Drupal certified", logo: "https://cdn.simpleicons.org/drupal" }],
-  experiences: [
-    {
-      id: 1,
-      client_name: "Disney",
-      client_logo: "https://logo.clearbit.com/disney.com",
-      period: "Jan 2023 - Présent",
-      role: "Développeur Frontend",
-      context: "Projet de refonte globale du site consommateur.",
-      phases: "• Conception\n• Développement",
-      tech_stack: ["Drupal", "Twig"],
-      forceNewPage: false
-    }
-  ],
-  education: [{ year: "2008/2010", degree: "Master Miage", location: "Orléans" }],
-  skills_categories: {
-    "Langages": [{ name: "JAVA", rating: 4 }, { name: "PHP", rating: 5 }],
-    "Outils": [{ name: "Jira", rating: 5 }]
-  }
-};
+// (DEFAULT_CV_DATA moved to src/utils/cv.js)
 
 // (Utils moved to src/utils/cv.js)
 
@@ -94,241 +57,6 @@ const DEFAULT_CV_DATA = {
 // (ExperienceItem moved to separate file)
 
 // --- COMPOSANTS UI FORMULAIRE ---
-
-const ButtonUI = ({ children, onClick, variant = "primary", className = "", disabled = false, title = "" }) => {
-  const baseStyle = "px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 justify-center";
-  const variants = {
-    primary: "bg-[#2E86C1] text-white hover:bg-[#2573a7] shadow-md",
-    secondary: "bg-slate-100 text-slate-600 hover:bg-slate-200",
-    outline: "border-2 border-[#2E86C1] text-[#2E86C1] hover:bg-blue-50",
-    danger: "bg-red-50 text-red-600 hover:bg-red-100 p-2",
-    ghost: "text-slate-500 hover:bg-slate-100",
-    toolbar: "p-1.5 hover:bg-slate-200 rounded text-slate-600"
-  };
-  return <button onClick={onClick} disabled={disabled} title={title} className={`${baseStyle} ${variants[variant]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}>{children}</button>;
-};
-
-const InputUI = ({ label, value, onChange, placeholder, maxLength, type = "text" }) => (
-  <div className="mb-4 text-left">
-    <div className="flex justify-between items-baseline mb-1 text-left">
-      <label className="text-xs font-bold text-[#333333] uppercase tracking-wide">{String(label)}</label>
-      {maxLength && <span className={`text-[10px] ${String(value || '').length > maxLength ? 'text-red-500 font-bold' : 'text-slate-400'}`}>{String(value || '').length} / {maxLength}</span>}
-    </div>
-    <input type={type} value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2E86C1] text-sm text-[#333333] transition-all" />
-  </div>
-);
-
-const RichTextareaUI = ({ label, value, onChange, placeholder }) => {
-  const textareaRef = useRef(null);
-
-  const handleTextChange = (e) => {
-    onChange(e.target.value);
-  };
-
-  const insertTag = (tag) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const selected = text.substring(start, end);
-    const before = text.substring(0, start);
-    const after = text.substring(end);
-
-    if (tag === 'b') {
-      onChange(`${before}<b>${selected}</b>${after}`);
-    } else if (tag === 'list') {
-      if (start !== end) {
-        const bulletedLines = selected.split('\n').map(line => 
-          line.trim() === "" ? line : (line.startsWith('• ') ? line : `• ${line}`)
-        ).join('\n');
-        onChange(before + bulletedLines + after);
-      } else {
-        onChange(`${before}• ${after}`);
-      }
-    } else if (['left', 'center', 'right', 'justify'].includes(tag)) {
-      if (start === end) {
-        // Applique l'alignement à tout le texte sans ajouter de sauts de ligne
-        let cleanText = text.replace(/<div class="text-(left|center|right|justify)">/g, '').replace(/<\/div>/g, '');
-        onChange(`<div class="text-${tag}">${cleanText}</div>`);
-      } else {
-        // Applique uniquement sur la sélection sans sauts de ligne
-        onChange(`${before}<div class="text-${tag}">${selected}</div>${after}`);
-      }
-    }
-  };
-
-  const copyToClipboard = (url) => {
-    if (value) {
-      const prompt = "Agis comme un expert Smile. Reformule ce texte pour un CV de consultant. Ton 'corporate', direct. Corrige les fautes. PAS de markdown. Texte : \n";
-      const fullText = prompt + value;
-      const textArea = document.createElement("textarea");
-      textArea.value = fullText;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-    }
-    window.open(url, '_blank');
-  };
-
-  return (
-    <div className="mb-6 text-left">
-      <div className="flex justify-between items-end mb-1 text-left">
-        <label className="text-xs font-bold text-[#333333] uppercase block">{String(label)}</label>
-      </div>
-      <div className="bg-slate-50 border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2E86C1] transition-all shadow-sm">
-        <div className="flex flex-col bg-white border-b border-slate-200 text-left">
-          <div className="px-3 py-1 bg-blue-50/50 border-b border-slate-50">
-            <p className="text-[9px] font-bold text-[#2E86C1] flex items-center gap-1 uppercase tracking-tight text-left">
-              <Sparkles size={10}/> Cliquez sur l'IA, puis faites simplement COLLER dans la fenêtre qui s'ouvre.
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-1 px-2 py-1.5 text-left flex-wrap">
-            <ButtonUI variant="toolbar" onClick={() => insertTag('b')} title="Gras"><Bold size={12}/></ButtonUI>
-            <ButtonUI variant="toolbar" onClick={() => insertTag('list')} title="Puce"><List size={12}/></ButtonUI>
-            <div className="w-px h-3 bg-slate-300 mx-1"></div>
-            
-            <div className="flex items-center bg-slate-100 hover:bg-slate-200 transition-colors rounded px-1.5 py-0.5">
-              <AlignJustify size={12} className="text-slate-500 mr-1" />
-              <select 
-                className="bg-transparent text-[10px] text-slate-600 outline-none cursor-pointer font-bold uppercase tracking-tighter"
-                onChange={(e) => {
-                  if (e.target.value) insertTag(e.target.value);
-                  e.target.value = ""; // Réinitialise le select après le choix
-                }}
-                defaultValue=""
-                title="Alignement"
-              >
-                <option value="" disabled>Alignement</option>
-                <option value="left">Gauche</option>
-                <option value="center">Centré</option>
-                <option value="right">Droite</option>
-                <option value="justify">Justifié</option>
-              </select>
-            </div>
-            <div className="w-px h-3 bg-slate-300 mx-1"></div>
-
-            <span className="text-[9px] text-slate-400 font-bold mr-1 uppercase tracking-tighter">IA:</span>
-            {[
-              { name: 'ChatGPT', url: 'https://chat.openai.com/', domain: 'openai.com' },
-              { name: 'Gemini', url: 'https://gemini.google.com/', icon: 'googlegemini' },
-              { name: 'Claude', url: 'https://claude.ai/', icon: 'anthropic' },
-              { name: 'Mistral', url: 'https://chat.mistral.ai/', domain: 'mistral.ai' }
-            ].map((tool) => (
-              <button key={tool.name} onClick={() => copyToClipboard(tool.url)} className="p-1 hover:bg-slate-100 rounded transition-all hover:scale-110 grayscale hover:grayscale-0 opacity-70 hover:opacity-100 text-left" title={`Copier & Ouvrir ${tool.name}`}>
-                <img 
-                  src={tool.domain ? `https://www.google.com/s2/favicons?domain=${tool.domain}&sz=64` : `https://cdn.simpleicons.org/${tool.icon}`} 
-                  onError={handleImageError} 
-                  className="w-4 h-4 object-contain" 
-                  alt={tool.name} 
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-        <textarea 
-          ref={textareaRef} 
-          className="w-full px-4 py-3 bg-transparent text-sm h-32 resize-none focus:outline-none border-none shadow-inner text-left" 
-          value={value || ''} 
-          onChange={handleTextChange} 
-          placeholder={placeholder} 
-        />
-      </div>
-    </div>
-  );
-};
-
-const DropZoneUI = ({ onFile, label = "Déposez une image", icon = <Upload size={16}/>, className = "" }) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const inputRef = useRef(null);
-  return (
-    <div 
-      className={`border-2 border-dashed rounded-lg p-3 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-1 ${isDragging ? 'border-[#2E86C1] bg-blue-50 scale-[1.02]' : 'border-slate-300 bg-white hover:border-[#2E86C1] hover:bg-slate-50'} ${className}`} 
-      onClick={() => inputRef.current.click()} 
-      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }} 
-      onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }} 
-      onDrop={(e) => { e.preventDefault(); setIsDragging(false); if(e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]); }}
-    >
-      <input type="file" style={{display: 'none'}} ref={inputRef} accept="image/*" onChange={(e) => { if(e.target.files[0]) onFile(e.target.files[0]); }} />
-      <div className={`transition-colors ${isDragging ? 'text-[#2E86C1]' : 'text-slate-400'}`}>{icon}</div>
-      <span className={`text-[10px] font-bold uppercase transition-colors px-2 leading-tight ${isDragging ? 'text-[#2E86C1]' : 'text-slate-500'}`}>{isDragging ? "Lâchez l'image !" : label}</span>
-    </div>
-  );
-};
-
-// --- MÉTHODE MIXTE HARMONISÉE AVEC SUGGESTIONS ---
-const LogoSelectorUI = ({ onSelect, label, suggestions = [] }) => {
-  const [search, setSearch] = useState("");
-  
-  const handleSelect = (query) => {
-    if (!query) return;
-    let finalSrc = "";
-    if (query.includes('.')) {
-      finalSrc = getClearbitUrl(query);
-    } else {
-      finalSrc = getIconUrl(query);
-    }
-    onSelect({ type: 'url', src: finalSrc, name: query });
-    setSearch("");
-  };
-
-  const handleFile = (file) => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => onSelect({ type: 'file', src: ev.target.result, name: file.name.split('.')[0] });
-      reader.readAsDataURL(file);
-    }
-  };
-
-  return (
-    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner text-left mb-4">
-      {label && <label className="text-[10px] font-black text-slate-500 uppercase block mb-3 tracking-widest">{String(label)}</label>}
-      
-      {suggestions.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
-          {suggestions.map((slug) => (
-            <button 
-              key={slug} 
-              onClick={() => handleSelect(slug)} 
-              className="p-1.5 hover:bg-blue-50 rounded-md transition-all group relative"
-              title={slug}
-            >
-              <img 
-                src={getIconUrl(slug)} 
-                onError={handleImageError} 
-                className="w-5 h-5 object-contain grayscale group-hover:grayscale-0 transition-all opacity-70 group-hover:opacity-100 group-hover:scale-110" 
-                alt={slug} 
-              />
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div className="flex gap-2 mb-3 text-left">
-        <div className="relative flex-1 text-left">
-          <input 
-            className="w-full pl-8 pr-2 py-2 bg-white border border-slate-300 rounded-lg text-xs text-left focus:ring-2 focus:ring-[#2E86C1] outline-none transition-all" 
-            placeholder="Nom (ex: drupal) ou Domaine (ex: google.com)" 
-            value={search} 
-            onChange={(e) => setSearch(e.target.value)} 
-            onKeyDown={(e) => e.key === 'Enter' && handleSelect(search)} 
-          />
-          <Search className="absolute left-2.5 top-2.5 text-slate-400" size={14} />
-        </div>
-        <ButtonUI variant="primary" className="px-3 h-auto" onClick={() => handleSelect(search)}><Plus size={14}/></ButtonUI>
-      </div>
-      
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center" aria-hidden="true"><div className="w-full border-t border-slate-200"></div></div>
-        <div className="relative flex justify-center text-[8px] font-bold uppercase tracking-tighter"><span className="bg-slate-50 px-2 text-slate-400">Ou charger un fichier</span></div>
-      </div>
-
-      <DropZoneUI onFile={handleFile} label="Glisser image personnalisée" icon={<Upload size={14}/>} className="mt-3 py-4" />
-    </div>
-  );
-};
 
 // --- COMPOSANT PRINCIPAL ---
 
@@ -356,62 +84,40 @@ export default function App() {
   const [draggedExpIndex, setDraggedExpIndex] = useState(null);
   const [draggedCertIndex, setDraggedCertIndex] = useState(null);
 
-  // --- GESTION DE L'HISTORIQUE (CTRL+Z) ---
-  const [history, setHistory] = useState([]);
-
-  const [cvData, setCvData] = useState(() => {
-    try {
-      const saved = localStorage.getItem('smile_cv_data_final_v30_stable');
-      if (saved) {
-         // --- SANITIZATION (Réparation des données corrompues) ---
-         const parsed = JSON.parse(saved);
-         // Si skills_categories est une chaîne au lieu d'un objet, on réinitialise
-         if (typeof parsed.skills_categories !== 'object' || Array.isArray(parsed.skills_categories)) {
-            parsed.skills_categories = DEFAULT_CV_DATA.skills_categories;
-         }
-         return parsed;
-      }
-    } catch(e) { console.error(e); }
-    return DEFAULT_CV_DATA;
-  });
+  const {
+    cvData,
+    updateCvData,
+    undo,
+    resetCV,
+    purgeData,
+    handleProfileChange,
+    handlePhotoUpload,
+    handleSmileLogo,
+    addTechLogo,
+    removeTechLogo,
+    addExperience,
+    updateExperience,
+    removeExperience,
+    addSkillCategory,
+    deleteCategory,
+    addSkillToCategory,
+    updateSkillInCategory,
+    removeSkillFromCategory,
+    updateEducation,
+    addEducation,
+    removeEducation,
+    addSecteur,
+    removeSecteur,
+    addCertification,
+    removeCertification,
+    moveItem,
+    history,
+  } = useCvData();
 
   // --- CALCULS DU DOCUMENT ---
-  // On définit ces variables ici pour qu'elles soient accessibles dans tout le composant
   const experiencePages = paginateExperiences(cvData.experiences);
   const totalPagesCount = 2 + experiencePages.length; 
   const scaledContentHeight = (totalPagesCount * 1122.5 * zoom) + ((totalPagesCount - 1) * 40 * zoom);
-
-  // Fonction pour mettre à jour les données avec sauvegarde dans l'historique
-  const updateCvData = useCallback((updater) => {
-    setCvData(prev => {
-      const next = typeof updater === 'function' ? updater(prev) : updater;
-      // On n'ajoute à l'historique que si les données ont réellement changé
-      if (JSON.stringify(prev) !== JSON.stringify(next)) {
-        setHistory(h => [prev, ...h].slice(0, 30)); // Limite à 30 étapes
-      }
-      return next;
-    });
-  }, []);
-
-  const undo = useCallback(() => {
-    if (history.length > 0) {
-      const [lastState, ...remainingHistory] = history;
-      setCvData(lastState);
-      setHistory(remainingHistory);
-    }
-  }, [history]);
-
-  // Écouteur global pour le Ctrl+Z
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-        e.preventDefault();
-        undo();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [undo]);
 
   useEffect(() => {
     const accepted = localStorage.getItem('smile_cv_privacy_accepted');
@@ -430,13 +136,6 @@ export default function App() {
     };
     document.head.appendChild(script);
   }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      localStorage.setItem('smile_cv_data_final_v30_stable', JSON.stringify(cvData));
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [cvData]);
 
   const getFilenameBase = () => {
     const year = new Date().getFullYear();
@@ -478,7 +177,6 @@ export default function App() {
     setImportError(null);
     try {
       let rawText = await extractTextFromPDF(pendingFile);
-      // Nettoyage agressif pour limiter la taille du payload
       rawText = rawText.replace(/\s+/g, ' ').trim().substring(0, 15000);
       
       const prompt = `Agis comme un expert Smile. Analyse ce texte de CV et retourne un objet JSON structuré. 
@@ -491,7 +189,6 @@ Règles de formatage impératives :
 - certifications (name)
 Texte : ${rawText}`;
 
-      // Appel vers le backend (Proxy Vercel)
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -525,35 +222,14 @@ Texte : ${rawText}`;
     }
   };
 
-  const handleProfileChange = (f, v) => updateCvData(p => ({ ...p, profile: { ...p.profile, [f]: v } }));
-  const handlePhotoUpload = (file) => { if(file) { const reader = new FileReader(); reader.onload = (ev) => updateCvData(prev => ({...prev, profile: { ...prev.profile, photo: ev.target.result }})); reader.readAsDataURL(file); } };
-  const addTechLogo = (o) => updateCvData(p => ({ ...p, profile: { ...p.profile, tech_logos: [...p.profile.tech_logos, o] } }));
-  const removeTechLogo = (i) => updateCvData(p => ({ ...p, profile: { ...p.profile, tech_logos: p.profile.tech_logos.filter((_, idx) => idx !== i) } }));
-  const handleSmileLogo = (file) => { if(file) { const reader = new FileReader(); reader.onload = (ev) => updateCvData(prev => ({...prev, smileLogo: ev.target.result})); reader.readAsDataURL(file); } };
-  
-  const moveItem = (listName, index, direction) => {
-    const list = [...cvData[listName]];
-    const target = direction === 'up' ? index - 1 : index + 1;
-    if (target >= 0 && target < list.length) {
-      [list[index], list[target]] = [list[target], list[index]];
-      updateCvData(p => ({ ...p, [listName]: list }));
-    }
+  const handleAddSkillToCategory = (cat) => { 
+    const i = newSkillsInput[cat] || { name: '', rating: 3 }; 
+    if (i.name) { 
+      addSkillToCategory(cat, { name: i.name, rating: i.rating }); 
+      setNewSkillsInput(p => ({ ...p, [cat]: { name: '', rating: 3 } })); 
+    } 
   };
-
-  const updateExperience = (id, f, v) => updateCvData(p => ({ ...p, experiences: p.experiences.map(e => e.id === id ? { ...e, [f]: v } : e) }));
-  const addExperience = () => updateCvData(p => ({ ...p, experiences: [{ id: Date.now(), client_name: "", client_logo: null, period: "", role: "", context: "", phases: "", achievements: [], tech_stack: [], forceNewPage: false }, ...p.experiences] }));
-  const removeExperience = (id) => updateCvData(p => ({ ...p, experiences: p.experiences.filter(e => e.id !== id) }));
-  
-  const addSkillCategory = () => { if (newCategoryName) { updateCvData(p => ({ ...p, skills_categories: { ...p.skills_categories, [newCategoryName]: [] } })); setNewCategoryName(""); } };
-  const deleteCategory = (n) => updateCvData(p => { 
-    const newC = { ...p.skills_categories }; 
-    delete newC[n]; 
-    return { ...p, skills_categories: newC }; 
-  });
-  const updateSkillInCategory = (cat, idx, f, v) => updateCvData(p => { const s = [...p.skills_categories[cat]]; s[idx] = { ...s[idx], [f]: v }; return { ...p, skills_categories: { ...p.skills_categories, [cat]: s } }; });
-  const addSkillToCategory = (cat) => { const i = newSkillsInput[cat] || { name: '', rating: 3 }; if (i.name) { updateCvData(p => ({ ...p, skills_categories: { ...p.skills_categories, [cat]: [...p.skills_categories[cat], { name: i.name, rating: i.rating }] } })); setNewSkillsInput(p => ({ ...p, [cat]: { name: '', rating: 3 } })); } };
   const updateNewSkillInput = (cat, field, val) => { setNewSkillsInput(p => ({ ...p, [cat]: { ...(p[cat] || { name: '', rating: 3 }), [field]: val } })); };
-  const removeSkillFromCategory = (cat, idx) => updateCvData(p => ({ ...p, skills_categories: { ...p.skills_categories, [cat]: p.skills_categories[cat].filter((_, i) => i !== idx) } }));
   
   const handleDragOver = (e) => e.preventDefault();
 
@@ -612,31 +288,12 @@ Texte : ${rawText}`;
     setDraggedCertIndex(null);
   };
 
-  const addSecteur = () => { if (newSecteur) { updateCvData(p => ({ ...p, connaissances_sectorielles: [...p.connaissances_sectorielles, newSecteur] })); setNewSecteur(""); }};
-  const removeSecteur = (idx) => updateCvData(p => ({ ...p, connaissances_sectorielles: p.connaissances_sectorielles.filter((_, i) => i !== idx) }));
-  
-  const addCertification = (o) => updateCvData(p => ({ ...p, certifications: [...p.certifications, { name: o.name, logo: o.src }] }));
-  const removeCertification = (idx) => updateCvData(p => ({ ...p, certifications: p.certifications.filter((_, i) => i !== idx) }));
-  
-  const updateEducation = (i, f, v) => { const n = [...cvData.education]; n[i][f] = v; updateCvData(p => ({ ...p, education: n })); };
-  const addEducation = () => updateCvData(p => ({ ...p, education: [...p.education, { year: "", degree: "", location: "" }] }));
-  const removeEducation = (i) => updateCvData(prev => ({ ...prev, education: prev.education.filter((_, idx) => idx !== i) }));
-  
-  const acceptPrivacy = () => {
-    localStorage.setItem('smile_cv_privacy_accepted', 'true');
-    setShowPrivacyNotice(false);
-    setShowGuide(true);
-  };
-
   const handlePurgeData = () => {
-    localStorage.removeItem('smile_cv_data_final_v30_stable');
-    localStorage.removeItem('smile_cv_privacy_accepted');
-    updateCvData(DEFAULT_CV_DATA);
+    purgeData();
     setShowPurgeConfirm(false);
     setShowPrivacyNotice(true); 
   };
 
-  const resetCV = () => { updateCvData(DEFAULT_CV_DATA); setShowResetConfirm(false); };
   const downloadJSON = () => { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cvData)); a.download = `${getFilenameBase()}.json`; a.click(); };
   
   const uploadJSON = (e) => {
@@ -667,13 +324,32 @@ Texte : ${rawText}`;
     reader.readAsText(file);
   };
   
-  const handlePrint = () => {
+  
+  const acceptPrivacy = () => {
+    localStorage.setItem('smile_cv_privacy_accepted', 'true');
+    setShowPrivacyNotice(false);
+    setShowGuide(true);
+  };
+
+   const handlePrint = () => {
       const printWindow = window.open('', '_blank');
       const content = document.querySelector('.print-container').innerHTML;
       const styles = Array.from(document.querySelectorAll('style')).map(s => s.innerHTML).join('\n');
       printWindow.document.write(`<html><head><title>${getFilenameBase()}</title><script src="https://cdn.tailwindcss.com"></script><style>${styles}</style><style>@page { size: A4; margin: 0; } body { margin: 0; padding: 0; background: white; width: 210mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .A4-page { box-shadow: none !important; margin: 0 !important; page-break-after: always !important; height: 297mm !important; width: 210mm !important; display: flex !important; flex-direction: column !important; } .triangle-bg, .bg-[#2E86C1], .bg-blue-50, .hexagon-fill { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: inherit !important; fill: inherit !important; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }</style></head><body onload="setTimeout(() => { window.print(); window.close(); }, 1000)"><div class="flex flex-col">${content}</div></body></html>`);
       printWindow.document.close();
   };
+
+  // Écouteur global pour le Ctrl+Z
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        undo();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo]);
 
   // (PageCompetences component definitions removed from App.jsx as they're now in separate files)
 
@@ -736,7 +412,7 @@ Texte : ${rawText}`;
       )}
 
       {showPurgeConfirm && (
-        <ModalUI title="Supprimer définitivement ?" onClose={() => setShowPurgeConfirm(false)} onConfirm={handlePurgeData} confirmText="Oui, purger tout">
+        <ModalUI title="Supprimer définitivement ?" onClose={() => setShowPurgeConfirm(false)} onConfirm={() => { purgeData(); setShowPurgeConfirm(false); setShowPrivacyNotice(true); }} confirmText="Oui, purger tout">
           <p>Toutes vos données seront supprimées de votre navigateur. Cette action est irréversible.</p>
         </ModalUI>
       )}
@@ -854,18 +530,25 @@ Texte : ${rawText}`;
                   label="Technologies (Suggestions Smile)" 
                   suggestions={[
                     'drupal', 'symfony', 'php', 'react', 'python', 
-                    'powerbi', 'snowflake', 'databricks', 'apachenifi', 'amazonaws', 'googlecloud', 'azure', 
-                    'mysql', 'postgresql', 'docker', 'git', 'javascript', 'tailwindcss'
+                    'powerbi', 'snowflake', 'databricks', 'apachenifi', 
+                    'amazonaws', 'amazoniotcore', 'amazoniotgreengrass', 'googlecloud', 'azure', 
+                    'mysql', 'postgresql', 'docker', 'git', 'javascript', 'tailwindcss',
+                    'linux', 'android', 'freertos', 'zephyr', 'buildroot', 'yoctoproject', 'openwrt',
+                    'gstreamer', 'opencv', 'qt', 'c', 'cplusplus', 'java', 'springboot', 'terraform'
                   ]}
                 />
                 
                 <div className="flex flex-wrap gap-2 mt-4 p-4 bg-slate-900 rounded-lg border border-slate-800 shadow-inner text-left">
-                  {cvData.profile.tech_logos.map((logo, i) => (
-                    <div key={i} className="relative group bg-white/10 p-2 rounded-md border border-white/5 transition-colors hover:bg-white/20 text-left">
-                      <img src={logo.src} onError={handleImageError} className="w-6 h-6 object-contain brightness-0 invert text-left" alt={logo.name} />
-                      <button onClick={() => removeTechLogo(i)} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 shadow-sm text-left"><X size={10} /></button>
-                    </div>
-                  ))}
+                  {cvData.profile.tech_logos?.map((logo, i) => {
+                    const src = typeof logo === 'string' ? `https://cdn.simpleicons.org/${logo.toLowerCase().replace(/\s+/g, '')}` : logo.src;
+                    const name = typeof logo === 'string' ? logo : logo.name;
+                    return (
+                      <div key={i} className="relative group bg-white/10 p-2 rounded-md border border-white/5 transition-colors hover:bg-white/20 text-left">
+                        <img src={src} onError={handleImageError} className="w-6 h-6 object-contain brightness-0 invert text-left" alt={String(name)} />
+                        <button onClick={() => removeTechLogo(i)} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 shadow-sm text-left"><X size={10} /></button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -896,8 +579,8 @@ Texte : ${rawText}`;
                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm text-left">
                  <h3 className="text-[10px] font-black uppercase text-slate-400 mb-4 text-left">Secteur & Certifs</h3>
                  <div className="flex gap-2 mb-4 text-left">
-                   <input className="flex-1 px-3 py-1.5 border rounded text-xs text-left" placeholder="Secteur..." value={newSecteur} onChange={e=>setNewSecteur(e.target.value)} onKeyDown={e=>e.key==='Enter' && addSecteur()} />
-                   <ButtonUI variant="primary" className="p-1 h-auto text-left" onClick={addSecteur}><Plus size={10}/></ButtonUI>
+                   <input className="flex-1 px-3 py-1.5 border rounded text-xs text-left" placeholder="Secteur..." value={newSecteur} onChange={e=>setNewSecteur(e.target.value)} onKeyDown={e=>e.key==='Enter' && (addSecteur(newSecteur), setNewSecteur(""))} />
+                   <ButtonUI variant="primary" className="p-1 h-auto text-left" onClick={() => { addSecteur(newSecteur); setNewSecteur(""); }}><Plus size={10}/></ButtonUI>
                  </div>
                  <div className="flex flex-wrap gap-1 mb-4 text-left">{(cvData.connaissances_sectorielles || []).map((s, i) => (<span key={i} className="bg-white text-[9px] font-bold px-2 py-0.5 rounded border flex items-center gap-1 uppercase text-left">{s} <X size={10} className="cursor-pointer text-left" onClick={() => removeSecteur(i)}/></span>))}</div>
                  
@@ -969,12 +652,12 @@ Texte : ${rawText}`;
                       placeholder="Nouvelle catégorie (ex: Outils...)" 
                       value={newCategoryName} 
                       onChange={(e) => setNewCategoryName(e.target.value)} 
-                      onKeyDown={(e) => e.key === 'Enter' && addSkillCategory()} 
+                      onKeyDown={(e) => e.key === 'Enter' && (addSkillCategory(newCategoryName), setNewCategoryName(""))} 
                     />
-                    <ButtonUI variant="outline" className="px-3 text-left" onClick={addSkillCategory}><Plus size={14}/></ButtonUI>
+                    <ButtonUI variant="outline" className="px-3 text-left" onClick={() => { addSkillCategory(newCategoryName); setNewCategoryName(""); }}><Plus size={14}/></ButtonUI>
                   </div>
 
-                  {Object.entries(cvData.skills_categories).map(([cat, skills], catIdx) => (
+                   {Object.entries(cvData.skills_categories).map(([cat, skills], catIdx) => (
                     <div 
                       key={cat} 
                       className={`mb-4 p-3 bg-slate-50 rounded-lg text-left relative transition-all ${draggedCategory === cat ? 'opacity-30 border-dashed border-2 border-blue-400' : ''}`}
@@ -1022,9 +705,9 @@ Texte : ${rawText}`;
                           placeholder="Ajouter un item..." 
                           value={newSkillsInput[cat]?.name || ''} 
                           onChange={(e) => updateNewSkillInput(cat, 'name', e.target.value)} 
-                          onKeyDown={(e) => e.key === 'Enter' && addSkillToCategory(cat)} 
+                          onKeyDown={(e) => e.key === 'Enter' && handleAddSkillToCategory(cat)} 
                         />
-                        <ButtonUI variant="primary" className="p-1 h-auto text-left" onClick={() => addSkillToCategory(cat)}><Plus size={10}/></ButtonUI>
+                        <ButtonUI variant="primary" className="p-1 h-auto text-left" onClick={() => handleAddSkillToCategory(cat)}><Plus size={10}/></ButtonUI>
                       </div>
 
                     </div>
@@ -1147,9 +830,13 @@ Texte : ${rawText}`;
                     </div>
                   )}
                   <div className="w-full bg-[#2E86C1] py-3 px-16 mb-1 flex items-center justify-center gap-10 shadow-inner relative z-10 flex-shrink-0 text-left tech-banner">
-                    {(cvData.profile.tech_logos || []).map((logo, i) => (
-                      logo.src && logo.src !== "null" ? <img key={i} src={logo.src} onError={handleImageError} className="h-14 w-auto object-contain brightness-0 invert opacity-95 transition-transform" alt={String(logo.name)} /> : null
-                    ))}
+                    {(cvData.profile.tech_logos || []).map((logo, i) => {
+                      const src = typeof logo === 'string' ? `https://cdn.simpleicons.org/${logo.toLowerCase().replace(/\s+/g, '')}` : logo.src;
+                      const name = typeof logo === 'string' ? logo : logo.name;
+                      return src && src !== "null" ? (
+                        <img key={i} src={src} onError={handleImageError} className="h-14 w-auto object-contain brightness-0 invert opacity-95 transition-transform" alt={String(name)} />
+                      ) : null;
+                    })}
                   </div>
                   <div className="flex justify-center gap-12 relative z-10 px-10 flex-shrink-0 mt-2 text-left">
                     {(cvData.soft_skills || []).map((skill, i) => (
