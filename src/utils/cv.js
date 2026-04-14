@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 /**
  * Format string for HTML preview, handling bold tags and alignment divs.
  */
@@ -16,13 +18,15 @@ export const formatTextForPreview = (text, withQuotes = false) => {
     }
   }
 
-  return content
+  const result = content
     .replace(/</g, "&lt;").replace(/>/g, "&gt;") 
     .replace(/&lt;b&gt;/g, "<b>").replace(/&lt;\/b&gt;/g, "</b>") 
     // Autorise les div d'alignement
     .replace(/&lt;div class="text-(left|center|right|justify)"&gt;\n?/g, '<div class="text-$1">')
     .replace(/\n?&lt;\/div&gt;/g, "</div>")
-    .replace(/\n/g, "<br/>"); 
+    .replace(/\n/g, "<br/>");
+
+  return DOMPurify.sanitize(result, { ALLOWED_TAGS: ['b', 'br', 'div'], ALLOWED_ATTR: ['class'] });
 };
 
 /**

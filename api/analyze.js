@@ -27,6 +27,10 @@ export default async function handler(req, res) {
   
 IMPORTANT : Ne réponds RIEN d'autre que l'objet JSON brut. Pas de markdown, pas de balises.
 
+Règles de formatage impératives :
+- profile.summary : paragraphe unique fluide (PAS de puces, PAS de tirets), maximum 7 lignes.
+- experiences[].phases : liste à puces (•) avec des VERBES D'ACTION en début de ligne.
+
 Structure JSON attendue :
 {
   "profile": {
@@ -35,7 +39,7 @@ Structure JSON attendue :
     "current_role": "Intitulé du poste",
     "years_experience": "Années d'XP (ex: 5)",
     "main_tech": "Technologie principale",
-    "summary": "Résumé court (7 lignes max)"
+    "summary": "Résumé en paragraphe unique (7 lignes max, pas de puces)"
   },
   "experiences": [
     { 
