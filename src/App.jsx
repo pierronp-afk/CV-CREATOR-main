@@ -245,8 +245,13 @@ export default function App() {
       const printWindow = window.open('', '_blank');
       const content = document.querySelector('.print-container').innerHTML;
       const styles = Array.from(document.querySelectorAll('style')).map(s => s.outerHTML).join('\n');
-      const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(l => l.outerHTML).join('\n');
-      printWindow.document.write(`<html><head><title>${getFilenameBase()}</title>${links}${styles}<style>@page { size: A4; margin: 0; } body { margin: 0; padding: 0; background: white; width: 210mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .A4-page { box-shadow: none !important; margin: 0 !important; page-break-after: always !important; height: 297mm !important; width: 210mm !important; display: flex !important; flex-direction: column !important; } .triangle-bg, .bg-[#2E86C1], .bg-blue-50, .hexagon-fill { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: inherit !important; fill: inherit !important; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }</style></head><body onload="setTimeout(() => { window.print(); window.close(); }, 500)"><div class="flex flex-col">${content}</div></body></html>`);
+      const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+        .map(l => {
+          const clone = l.cloneNode();
+          if (clone.href) clone.href = new URL(clone.href, window.location.href).href;
+          return clone.outerHTML;
+        }).join('\n');
+      printWindow.document.write(`<html><head><title>${getFilenameBase()}</title>${links}${styles}<style>@page { size: A4; margin: 0; } body { margin: 0; padding: 0; background: white; width: 210mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .A4-page { box-shadow: none !important; margin: 0 !important; page-break-after: always !important; height: 297mm !important; width: 210mm !important; display: flex !important; flex-direction: column !important; overflow: visible !important; } .triangle-bg, .bg-[#2E86C1], .bg-blue-50, .hexagon-fill { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: inherit !important; fill: inherit !important; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }</style></head><body onload="setTimeout(() => { window.print(); window.close(); }, 500)"><div class="flex flex-col">${content}</div></body></html>`);
       printWindow.document.close();
   };
 
