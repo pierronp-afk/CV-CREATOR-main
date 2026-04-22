@@ -378,13 +378,20 @@ export default function App() {
 
         <div className="p-6 border-b border-slate-100 bg-white sticky top-0 z-20 text-left">
           <div className="flex justify-between items-center mb-6 text-left">
-            <div className="flex items-center gap-2">
-              <img src="/Smile_1584.png" alt="Smile Logo" className="h-8 w-auto" />
-              <button onClick={() => setShowGuide(true)} className="text-slate-400 hover:text-[#ff8054] transition-colors p-1 rounded-full hover:bg-slate-50" title="Guide de rédaction">
-                <LifeBuoy size={20} />
-              </button>
+            <div className="flex items-center gap-3">
+              <img src="/smile-logo.png" alt="Smile" className="h-11 w-auto" />
+              <div className="flex flex-col border-l-2 border-[#3b72ff] pl-3 leading-none">
+                <span className="text-[10px] font-black text-[#3b72ff] uppercase tracking-wider">CV</span>
+                <span className="text-[16px] font-black text-[#3b72ff] uppercase tracking-tight">Editor</span>
+              </div>
             </div>
-            <span className="text-xs font-bold text-slate-400 text-left">Étape {step} / 4</span>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setShowGuide(true)} className="flex items-center gap-1.5 text-slate-400 hover:text-[#ff8054] transition-colors px-2 py-1 rounded-lg hover:bg-slate-50 border border-slate-100 shadow-sm group" title="Guide de rédaction">
+                <LifeBuoy size={16} className="group-hover:animate-spin-slow" />
+                <span className="text-xs font-black">?</span>
+              </button>
+              <span className="text-xs font-bold text-slate-400 text-left">Étape {step} / 4</span>
+            </div>
           </div>
           <div className="flex gap-2 text-left">
             <button className="flex-1 bg-slate-100 text-slate-600 hover:bg-slate-200 px-4 py-2 rounded-lg font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed text-left flex items-center justify-center gap-2" onClick={() => setStep(s => Math.max(1, s - 1))} disabled={step === 1}>
@@ -540,6 +547,8 @@ export default function App() {
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .A4-page { width: 210mm; height: 297mm; background: white; flex-shrink: 0; box-sizing: border-box; position: relative; }
+        .animate-spin-slow { animation: spin 3s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @media print {
           @page { size: A4; margin: 0; }
           body { margin: 0; padding: 0; background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }

@@ -67,7 +67,7 @@ export const DEFAULT_CV_DATA = {
   showSecteur: true,
   showCertif: true,
   swapPages: false, // false: Compétences en p2 | true: Expériences en p2
-  smileLogo: "/Smile_1584.png", 
+  smileLogo: "/favicon.png", 
   profile: {
     firstname: "Prénom",
     lastname: "NOM",
