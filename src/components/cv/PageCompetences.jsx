@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cpu, Factory, Award, GraduationCap } from 'lucide-react';
+import { Cpu, Factory, Award, GraduationCap, Languages } from 'lucide-react';
 import A4Page from './A4Page';
 import CornerTriangle from './CornerTriangle';
 import HeaderSmall from '../ui/HeaderSmall';
@@ -20,86 +20,113 @@ const PageCompetences = ({ cvData }) => {
         role={cvData.profile.current_role} 
         logo={cvData.smileLogo} 
       />
-      <div className="grid grid-cols-12 gap-10 mt-8 h-full px-12 flex-1 pb-32 overflow-hidden print:overflow-visible text-left">
-          <div className="col-span-5 border-r border-slate-100 pr-8 text-left">
-            <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-8 flex items-center gap-2 text-left">
-              <Cpu size={20}/> Mes Compétences
-            </h3>
-            <div className="space-y-8 text-left">
-              {Object.entries(cvData.skills_categories || {}).map(([cat, skills]) => (
-                <div key={cat}>
-                  <h4 className="text-[10px] font-bold text-[#999999] uppercase tracking-widest border-b border-slate-100 pb-2 mb-3 text-left">
-                    {String(cat)}
+      <div className="flex flex-col h-full px-12 flex-1 pb-32 overflow-hidden print:overflow-visible">
+        
+        {/* === BLOC HAUT : COMPÉTENCES (taille naturelle, pas de flex-1) === */}
+        <section className="flex-shrink-0 mt-8">
+          <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2">
+            <Cpu size={20}/> Mes Compétences
+          </h3>
+          <div className="grid grid-cols-3 gap-x-6 gap-y-4">
+            {Object.entries(cvData.skills_categories || {}).map(([cat, skills]) => (
+              <div key={cat} className="break-inside-avoid">
+                <h4 className="text-[9px] font-bold text-[#999999] uppercase tracking-widest border-b border-slate-100 pb-1.5 mb-2">
+                  {String(cat)}
+                </h4>
+                <div className="space-y-1">
+                  {(skills || []).map((skill, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-[#333333] uppercase truncate flex-shrink min-w-0">
+                        {String(skill.name)}
+                      </span>
+                      <HexagonRating score={skill.rating} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* === ESPACE FLEXIBLE QUI PUSH LE BLOC BAS AU CENTRE === */}
+        <div className="flex-1 flex flex-col justify-center min-h-0">
+          
+          {/* Séparateur centré */}
+          <div className="border-t border-slate-200 mb-8"></div>
+
+          {/* BLOC BAS : 2 colonnes */}
+          <div className="grid grid-cols-2 gap-10">
+            
+            {/* COLONNE GAUCHE : Secteurs + Certifications */}
+            <div className="flex flex-col gap-6">
+              {cvData.showSecteur && (cvData.connaissances_sectorielles || []).length > 0 && (
+                <section>
+                  <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-3 flex items-center gap-2">
+                    <Factory size={20}/> Connaissances Sectorielles
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(cvData.connaissances_sectorielles || []).map((s, i) => (
+                      <span key={i} className="border-2 border-[#2E86C1] text-[#2E86C1] text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-wider">
+                        {String(s)}
+                      </span>
+                    ))}
+                  </div>
+                </section>
+              )}
+              {cvData.showCertif && (cvData.certifications || []).length > 0 && (
+                <section>
+                  <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-3 flex items-center gap-2">
+                    <Award size={20}/> Certifications
+                  </h3>
+                  <div className="grid grid-cols-1 gap-2">
+                    {cvData.certifications.map((c, i) => (
+                      <div key={i} className="flex items-center gap-2 bg-slate-50 p-1.5 rounded">
+                        {c.logo && c.logo !== "null" && (
+                          <img src={c.logo} onError={handleImageError} className="w-7 h-7 object-contain" alt={String(c.name)} />
+                        )}
+                        <span className="text-[10px] font-bold text-slate-700 uppercase leading-tight">{String(c.name)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+
+            {/* COLONNE DROITE : Formation + Langues */}
+            <section>
+              <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2">
+                <GraduationCap size={20}/> Ma Formation
+              </h3>
+              <div className="space-y-3">
+                {(cvData.education || []).map((edu, i) => (
+                  <div key={i} className="border-l-2 border-slate-100 pl-3">
+                    <span className="text-[10px] font-bold text-[#999999] block">{String(edu.year)}</span>
+                    <h4 className="text-xs font-bold text-[#333333] uppercase leading-tight">{String(edu.degree)}</h4>
+                    <span className="text-[9px] text-[#2E86C1] font-medium uppercase">{String(edu.location)}</span>
+                  </div>
+                ))}
+              </div>
+              {(cvData.languages || []).length > 0 && (
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <h4 className="text-[11px] font-bold text-[#2E86C1] uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <Languages size={14}/> Langues
                   </h4>
-                  <div className="space-y-3 text-left">
-                    {(skills || []).map((skill, i) => (
-                      <div key={i} className="flex items-center justify-between text-left">
-                        <span className="text-xs font-bold text-[#333333] uppercase text-left">
-                          {String(skill.name)}
-                        </span>
-                        <HexagonRating score={skill.rating} />
+                  <div className="flex flex-wrap gap-2">
+                    {cvData.languages.map((lang, i) => (
+                      <div key={i} className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
+                        <span className="text-[10px] font-bold text-[#333333] uppercase">{String(lang.name)}</span>
+                        <span className="text-[10px] font-black text-[#2E86C1] bg-white px-1.5 rounded">{String(lang.level)}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className="col-span-7 flex flex-col gap-10 text-left">
-            {cvData.showSecteur && (cvData.connaissances_sectorielles || []).length > 0 && (
-              <section className="text-left">
-                <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2 text-left">
-                  <Factory size={20}/> Connaissances Sectorielles
-                </h3>
-                <div className="flex flex-wrap gap-2 text-left">
-                  {(cvData.connaissances_sectorielles || []).map((s, i) => (
-                    <span key={i} className="border-2 border-[#2E86C1] text-[#2E86C1] text-[10px] font-black px-3 py-1 rounded uppercase tracking-wider text-left">
-                      {String(s)}
-                    </span>
-                  ))}
-                </div>
-              </section>
-            )}
-            {cvData.showCertif && (cvData.certifications || []).length > 0 && (
-              <section className="text-left">
-                <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2 text-left">
-                  <Award size={20}/> Certifications
-                </h3>
-                <div className="grid grid-cols-2 gap-4 text-left">
-                  {cvData.certifications.map((c, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-slate-50 p-2 rounded text-left">
-                      {c.logo && c.logo !== "null" && (
-                        <img src={c.logo} onError={handleImageError} className="w-8 h-8 object-contain" alt={String(c.name)} />
-                      )}
-                      <span className="text-[10px] font-bold text-slate-700 uppercase leading-tight text-left">
-                        {String(c.name)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-            <section className="text-left">
-              <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-6 flex items-center gap-2 text-left">
-                <GraduationCap size={20}/> Ma Formation
-              </h3>
-              <div className="space-y-4 text-left">
-                {(cvData.education || []).map((edu, i) => (
-                  <div key={i} className="border-l-2 border-slate-100 pl-4 text-left">
-                    <span className="text-[10px] font-bold text-[#999999] block mb-1 text-left">
-                      {String(edu.year)}
-                    </span>
-                    <h4 className="text-xs font-bold text-[#333333] uppercase leading-tight text-left">
-                      {String(edu.degree)}
-                    </h4>
-                    <span className="text-[9px] text-[#2E86C1] font-medium uppercase text-left">
-                      {String(edu.location)}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              )}
             </section>
           </div>
+
+          {/* Séparateur du bas (miroir visuel du haut pour equilibrer) */}
+          <div className="border-t border-slate-200 mt-8 opacity-0"></div>
+        </div>
       </div>
       <Footer />
     </A4Page>

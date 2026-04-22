@@ -31,7 +31,7 @@ export default function StepExperiences({
 
   return (
      <div className="space-y-8 animate-in slide-in-from-right duration-300 text-left">
-       <div className="flex justify-between items-center mb-4 text-[#2E86C1] text-left">
+       <div className="flex justify-between items-center mb-4 text-[#3b72ff] text-left">
          <div className="flex items-center gap-3 text-left">
            <Briefcase size={24} />
            <h2 className="text-lg font-bold uppercase text-left">Expériences</h2>
@@ -53,8 +53,8 @@ export default function StepExperiences({
            </div>
 
            <div className="absolute top-4 right-4 flex gap-1 text-left">
-             <button onClick={() => moveItem('experiences', index, 'up')} disabled={index === 0} className="text-slate-300 hover:text-blue-500 disabled:opacity-20 transition-colors text-left"><ChevronUp size={18}/></button>
-             <button onClick={() => moveItem('experiences', index, 'down')} disabled={index === cvData.experiences.length - 1} className="text-slate-300 hover:text-blue-500 disabled:opacity-20 transition-colors text-left"><ChevronDown size={18}/></button>
+             <button onClick={() => moveItem('experiences', index, 'up')} disabled={index === 0} className="text-slate-300 hover:text-[#3b72ff] disabled:opacity-20 transition-colors text-left"><ChevronUp size={18}/></button>
+             <button onClick={() => moveItem('experiences', index, 'down')} disabled={index === cvData.experiences.length - 1} className="text-slate-300 hover:text-[#3b72ff] disabled:opacity-20 transition-colors text-left"><ChevronDown size={18}/></button>
              <button onClick={() => removeExperience(exp.id)} className="text-red-300 hover:text-red-500 ml-1 text-left"><Trash2 size={16}/></button>
            </div>
 
@@ -79,9 +79,9 @@ export default function StepExperiences({
              </div>
 
              {/* SAUT DE PAGE MANUEL RÉINTÉGRÉ */}
-             <div className="mb-4 flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-100 text-left">
+             <div className="mb-4 flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200 text-left">
                 <div className="flex items-center gap-2 text-left">
-                  <FilePlus size={16} className="text-[#2E86C1]"/>
+                  <FilePlus size={16} className="text-[#3b72ff]"/>
                   <span className="text-xs font-bold text-slate-600 text-left">Saut de page manuel</span>
                 </div>
                 <button onClick={() => updateExperience(exp.id, 'forceNewPage', !exp.forceNewPage)} className="text-left">

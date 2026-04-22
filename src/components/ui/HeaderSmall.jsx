@@ -6,7 +6,7 @@ import { handleImageError } from '../../utils/cv';
  */
 const HeaderSmall = ({ isAnonymous, profile, role, logo }) => {
   const nameDisplay = isAnonymous 
-    ? `${profile.firstname?.[0] || ''}${profile.lastname?.substring(0, 2) || ''}` 
+    ? `${String(profile.firstname?.[0] || '').toUpperCase()}${String(profile.lastname?.substring(0, 3) || '').toUpperCase()}` 
     : `${profile.firstname} ${profile.lastname}`;
     
   return (

@@ -63,10 +63,11 @@ export const handleImageError = (e) => {
  */
 export const DEFAULT_CV_DATA = {
   isAnonymous: false,
+  hidePhoto: false,
   showSecteur: true,
   showCertif: true,
   swapPages: false, // false: Compétences en p2 | true: Expériences en p2
-  smileLogo: null, 
+  smileLogo: "/Smile_1584.png", 
   profile: {
     firstname: "Prénom",
     lastname: "NOM",
@@ -82,6 +83,10 @@ export const DEFAULT_CV_DATA = {
     ]
   },
   soft_skills: ["Agilité", "Rigueur", "Communication"],
+  languages: [
+    { name: "Anglais", level: "B2" },
+    { name: "Français", level: "C2" }
+  ],
   connaissances_sectorielles: ["Industrie", "E-commerce"],
   certifications: [{ name: "Drupal certified", logo: "https://cdn.simpleicons.org/drupal" }],
   experiences: [

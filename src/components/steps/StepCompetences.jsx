@@ -21,6 +21,10 @@ export default function StepCompetences({
   addSkillToCategory,
   updateSkillInCategory,
   removeSkillFromCategory,
+  languages,
+  addLanguage,
+  updateLanguage,
+  removeLanguage,
   moveItem,
 }) {
   // Local state for inputs
@@ -92,7 +96,7 @@ export default function StepCompetences({
 
   return (
      <div className="space-y-8 animate-in slide-in-from-right transition-all text-left">
-       <div className="flex items-center gap-3 mb-4 text-[#2E86C1] text-left"><GraduationCap size={24} /><h2 className="text-lg font-bold uppercase text-left">Formation & Compétences</h2></div>
+       <div className="flex items-center gap-3 mb-4 text-[#3b72ff] text-left"><GraduationCap size={24} /><h2 className="text-lg font-bold uppercase text-left">Formation & Compétences</h2></div>
        
        {/* SECTION CERTIFICATIONS AVEC DRAG & DROP */}
        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm text-left">
@@ -160,6 +164,39 @@ export default function StepCompetences({
          <ButtonUI onClick={addEducation} variant="secondary" className="w-full text-xs py-2 mt-2 shadow-sm text-left">Ajouter Formation</ButtonUI>
        </div>
 
+       {/* SECTION LANGUES (CECRL) */}
+       <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm text-left">
+         <h3 className="text-[10px] font-black uppercase text-slate-400 mb-4 text-left">Langues (CECRL)</h3>
+         {(cvData.languages || []).map((lang, i) => (
+           <div key={i} className="flex gap-2 mb-2 items-center bg-white p-2 rounded border">
+             <input 
+               className="flex-1 px-2 py-1 text-xs border rounded outline-none focus:ring-1 focus:ring-[#3b72ff]" 
+               placeholder="Langue (ex: Anglais)" 
+               value={lang.name} 
+               onChange={(e) => updateLanguage(i, 'name', e.target.value)} 
+             />
+             <select 
+               value={lang.level} 
+               onChange={(e) => updateLanguage(i, 'level', e.target.value)}
+               className="px-2 py-1 text-xs border rounded outline-none focus:ring-1 focus:ring-[#3b72ff] font-bold text-[#3b72ff]"
+             >
+               <option value="A1">A1 - Débutant</option>
+               <option value="A2">A2 - Élémentaire</option>
+               <option value="B1">B1 - Intermédiaire</option>
+               <option value="B2">B2 - Indépendant</option>
+               <option value="C1">C1 - Autonome</option>
+               <option value="C2">C2 - Maîtrise</option>
+             </select>
+             <button onClick={() => removeLanguage(i)} className="text-slate-300 hover:text-red-500">
+               <X size={14}/>
+             </button>
+           </div>
+         ))}
+         <ButtonUI onClick={addLanguage} variant="secondary" className="w-full text-xs py-2 mt-2 shadow-sm">
+           + Ajouter une langue
+         </ButtonUI>
+       </div>
+
        {/* SECTION COMPÉTENCES */}
        <div className="bg-white p-4 rounded-xl border border-slate-200 text-left">
           <h3 className="text-[10px] font-black uppercase text-slate-400 mb-4 text-left">Niveau Compétences</h3>
@@ -167,7 +204,7 @@ export default function StepCompetences({
           {/* AJOUT : Input nouvelle catégorie */}
           <div className="flex gap-2 mb-4 text-left">
             <input 
-              className="flex-1 px-3 py-2 border rounded text-xs text-left focus:ring-2 focus:ring-[#2E86C1] outline-none" 
+              className="flex-1 px-3 py-2 border rounded text-xs text-left focus:ring-2 focus:ring-[#3b72ff] outline-none" 
               placeholder="Nouvelle catégorie (ex: Outils...)" 
               value={newCategoryName} 
               onChange={(e) => setNewCategoryName(e.target.value)} 
@@ -211,7 +248,7 @@ export default function StepCompetences({
                          onChange={(e) => updateSkillInCategory(cat, idx, 'name', e.target.value)} 
                        />
                     </div>
-                    <HexagonRating score={skill.rating} onChange={(r) => updateSkillInCategory(cat, idx, 'rating', r)} />
+                    <HexagonRating score={skill.rating} color="#3b72ff" onChange={(r) => updateSkillInCategory(cat, idx, 'rating', r)} />
                     <button onClick={() => removeSkillFromCategory(cat, idx)} className="text-slate-300 hover:text-red-500 transition-colors p-0.5 flex-shrink-0"><X size={12}/></button>
                   </div>
                 ))}
@@ -220,7 +257,7 @@ export default function StepCompetences({
               {/* AJOUT : Input nouvel item */}
               <div className="flex gap-1 text-left pl-6 pt-2 border-t border-slate-100">
                 <input 
-                  className="flex-1 px-2 py-1 text-[10px] border rounded text-left focus:ring-1 focus:ring-[#2E86C1] outline-none" 
+                  className="flex-1 px-2 py-1 text-[10px] border rounded text-left focus:ring-1 focus:ring-[#3b72ff] outline-none" 
                   placeholder="Ajouter un item..." 
                   value={newSkillsInput[cat]?.name || ''} 
                   onChange={(e) => updateNewSkillInput(cat, 'name', e.target.value)} 

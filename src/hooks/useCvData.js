@@ -230,6 +230,28 @@ export const useCvData = () => {
     }));
   }, [updateCvData]);
 
+  const addLanguage = useCallback(() => {
+    updateCvData((p) => ({
+      ...p,
+      languages: [...(p.languages || []), { name: "", level: "B2" }],
+    }));
+  }, [updateCvData]);
+
+  const updateLanguage = useCallback((index, field, value) => {
+    updateCvData((p) => {
+      const list = [...(p.languages || [])];
+      list[index] = { ...list[index], [field]: value };
+      return { ...p, languages: list };
+    });
+  }, [updateCvData]);
+
+  const removeLanguage = useCallback((index) => {
+    updateCvData((p) => ({
+      ...p,
+      languages: (p.languages || []).filter((_, i) => i !== index),
+    }));
+  }, [updateCvData]);
+
   const addSecteur = useCallback((newSecteur) => {
     if (newSecteur) {
       updateCvData((p) => ({ 
@@ -300,6 +322,9 @@ export const useCvData = () => {
     removeSecteur,
     addCertification,
     removeCertification,
+    addLanguage,
+    updateLanguage,
+    removeLanguage,
     moveItem,
     history,
   };

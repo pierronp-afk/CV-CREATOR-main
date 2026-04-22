@@ -102,6 +102,9 @@ export default function App() {
     removeSecteur,
     addCertification,
     removeCertification,
+    addLanguage,
+    updateLanguage,
+    removeLanguage,
     moveItem,
     history,
   } = useCvData();
@@ -188,6 +191,7 @@ export default function App() {
         ...prev,
         ...result,
         profile: { ...prev.profile, ...result.profile },
+        languages: Array.isArray(result.languages) ? result.languages : (prev.languages || []),
         experiences: (result.experiences || []).map((exp, idx) => ({ 
           ...exp, 
           id: Date.now() + idx, 
@@ -221,6 +225,7 @@ export default function App() {
           education: Array.isArray(importedData.education) ? importedData.education : prev.education,
           connaissances_sectorielles: Array.isArray(importedData.connaissances_sectorielles) ? importedData.connaissances_sectorielles : prev.connaissances_sectorielles,
           certifications: Array.isArray(importedData.certifications) ? importedData.certifications : prev.certifications,
+          languages: Array.isArray(importedData.languages) ? importedData.languages : prev.languages,
           soft_skills: Array.isArray(importedData.soft_skills) ? importedData.soft_skills : prev.soft_skills,
           skills_categories: importedData.skills_categories || prev.skills_categories
         }));
@@ -337,7 +342,7 @@ export default function App() {
       <div className="w-full md:w-[500px] bg-white border-r border-slate-200 flex flex-col h-full z-10 shadow-xl print:hidden text-left">
         <div className="p-4 bg-slate-50/50 border-b border-slate-200 space-y-4">
           <div className="flex gap-2">
-            <button className="flex-1 bg-[#2E86C1] hover:bg-[#2573a7] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md transition-all uppercase text-sm" onClick={() => pdfInputRef.current.click()} disabled={isImporting}>
+            <button className="flex-1 bg-[#3b72ff] hover:bg-[#ff8054] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md transition-all uppercase text-sm" onClick={() => pdfInputRef.current.click()} disabled={isImporting}>
               {isImporting ? <Loader2 size={18} className="animate-spin text-white"/> : <FileSearch size={18} className="text-white"/>}
               <span className="drop-shadow-sm">{isImporting ? "Analyse..." : "Import PDF"}</span>
             </button>
@@ -349,22 +354,22 @@ export default function App() {
 
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm flex items-center justify-between px-2 py-4 text-left">
             <button className="flex-1 flex flex-col items-center gap-1.5 group" onClick={() => setShowResetConfirm(true)}>
-              <RefreshCw size={22} className="text-slate-400 group-hover:text-[#2E86C1] transition-colors"/>
+              <RefreshCw size={22} className="text-slate-400 group-hover:text-[#ff8054] transition-colors"/>
               <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter text-left">Refresh</span>
             </button>
             <div className="w-px h-10 bg-slate-100"></div>
             <button className={`flex-1 flex flex-col items-center gap-1.5 group ${history.length === 0 ? 'opacity-20 cursor-not-allowed' : ''}`} onClick={undo} disabled={history.length === 0}>
-              <Undo2 size={22} className="text-slate-400 group-hover:text-[#2E86C1] transition-colors"/>
+              <Undo2 size={22} className="text-slate-400 group-hover:text-[#ff8054] transition-colors"/>
               <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter text-left">Undo (Ctrl+Z)</span>
             </button>
             <div className="w-px h-10 bg-slate-100"></div>
             <button className="flex-1 flex flex-col items-center gap-1.5 group" onClick={downloadJSON}>
-              <Save size={22} className="text-slate-400 group-hover:text-[#2E86C1] transition-colors"/>
+              <Save size={22} className="text-slate-400 group-hover:text-[#ff8054] transition-colors"/>
               <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter text-left">Save</span>
             </button>
             <div className="w-px h-10 bg-slate-100"></div>
             <button className="flex-1 flex flex-col items-center gap-1.5 group" onClick={() => jsonInputRef.current.click()}>
-              <FolderOpen size={22} className="text-slate-400 group-hover:text-[#2E86C1] transition-colors"/>
+              <FolderOpen size={22} className="text-slate-400 group-hover:text-[#ff8054] transition-colors"/>
               <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter text-left">Upload</span>
               <input type="file" ref={jsonInputRef} className="hidden" accept=".json" onChange={uploadJSON} />
             </button>
@@ -374,8 +379,8 @@ export default function App() {
         <div className="p-6 border-b border-slate-100 bg-white sticky top-0 z-20 text-left">
           <div className="flex justify-between items-center mb-6 text-left">
             <div className="flex items-center gap-2">
-              <h1 className="font-bold text-xl text-[#2E86C1]">Smile Editor</h1>
-              <button onClick={() => setShowGuide(true)} className="text-slate-400 hover:text-[#2E86C1] transition-colors p-1 rounded-full hover:bg-slate-50" title="Guide de rédaction">
+              <img src="/Smile_1584.png" alt="Smile Logo" className="h-8 w-auto" />
+              <button onClick={() => setShowGuide(true)} className="text-slate-400 hover:text-[#ff8054] transition-colors p-1 rounded-full hover:bg-slate-50" title="Guide de rédaction">
                 <LifeBuoy size={20} />
               </button>
             </div>
@@ -386,7 +391,7 @@ export default function App() {
               <ArrowLeft size={16} /> Précédent
             </button>
             {step < 4 ? (
-              <button className="flex-[2] bg-[#2E86C1] text-white hover:bg-[#2573a7] px-4 py-2 rounded-lg font-bold text-sm shadow-md transition-all flex items-center gap-2 justify-center" onClick={() => setStep(s => Math.min(4, s + 1))}>Suivant <ArrowRight size={16} /></button>
+              <button className="flex-[2] bg-[#3b72ff] text-white hover:bg-[#ff8054] px-4 py-2 rounded-lg font-bold text-sm shadow-md transition-all flex items-center gap-2 justify-center" onClick={() => setStep(s => Math.min(4, s + 1))}>Suivant <ArrowRight size={16} /></button>
             ) : (
               <button className="flex-[2] bg-slate-900 hover:bg-black text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition-all flex items-center gap-2 justify-center" onClick={handlePrint}><Printer size={16} /> Générer PDF</button>
             )}
@@ -431,6 +436,10 @@ export default function App() {
                 addSkillToCategory={addSkillToCategory}
                 updateSkillInCategory={updateSkillInCategory}
                 removeSkillFromCategory={removeSkillFromCategory}
+                languages={cvData.languages}
+                addLanguage={addLanguage}
+                updateLanguage={updateLanguage}
+                removeLanguage={removeLanguage}
                 moveItem={moveItem}
               />
             )}
@@ -465,7 +474,7 @@ export default function App() {
             {/* PAGE 1 : PROFIL (Toujours en premier) */}
             <A4Page>
               <CornerTriangle customLogo={cvData.smileLogo} />
-              {!cvData.isAnonymous && cvData.profile.photo && cvData.profile.photo !== "null" && (
+              {!cvData.isAnonymous && !cvData.hidePhoto && cvData.profile.photo && cvData.profile.photo !== "null" && (
                 <div className="absolute top-12 right-12 w-44 h-44 rounded-full overflow-hidden border-4 border-white shadow-xl z-20 bg-white flex items-center justify-center text-left">
                   <img src={cvData.profile.photo} onError={handleImageError} className="max-w-full max-h-full object-contain" alt="Portrait" />
                 </div>
@@ -473,7 +482,7 @@ export default function App() {
               <div className="pt-36 px-16 pb-0 flex-shrink-0 text-left">
                  <h1 className="uppercase leading-[0.85] mb-8 font-montserrat text-[#333333] text-left">
                    {cvData.isAnonymous 
-                    ? `${String(cvData.profile.firstname?.[0] || '')}${String(cvData.profile.lastname?.substring(0, 2) || '')}` 
+                    ? `${String(cvData.profile.firstname?.[0] || '').toUpperCase()}${String(cvData.profile.lastname?.substring(0, 3) || '').toUpperCase()}` 
                     : <><span className="text-4xl block font-semibold opacity-90 text-left">{String(cvData.profile.firstname)}</span><span className="text-6xl font-black text-left">{String(cvData.profile.lastname)}</span></>}
                  </h1>
                  <div className="inline-block bg-[#2E86C1] text-white font-bold text-xl px-4 py-1 rounded-sm uppercase mb-6 tracking-wider shadow-sm text-left">{String(cvData.profile.years_experience)} ans d'expérience</div>

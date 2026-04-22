@@ -23,13 +23,34 @@ export default async function handler(req, res) {
     { id: "gemini-flash-latest", version: "v1beta" }
   ];
 
-  const prompt = `Tu es un expert en recrutement. Analyse ce CV et extrais les données en JSON strict.
-  
+  const prompt = `Tu es un expert en recrutement IT. Analyse ce CV et extrais les données en JSON strict.
+
 IMPORTANT : Ne réponds RIEN d'autre que l'objet JSON brut. Pas de markdown, pas de balises.
 
 Règles de formatage impératives :
 - profile.summary : paragraphe unique fluide (PAS de puces, PAS de tirets), maximum 7 lignes.
 - experiences[].phases : liste à puces (•) avec des VERBES D'ACTION en début de ligne.
+
+RÈGLE CLÉ POUR LES NIVEAUX DE COMPÉTENCES (rating de 1 à 5) :
+Tu DOIS évaluer le niveau de chaque compétence en te basant sur :
+  - La fréquence d'apparition dans les expériences professionnelles
+  - L'ancienneté cumulée d'utilisation de la technologie
+  - Le niveau de responsabilité associé (simple utilisation, développement, architecture, expertise, lead/formation)
+  - Les certifications associées à cette compétence
+
+Barème impératif :
+  - 1 = Notion / découverte (cité une fois, pas de mise en pratique significative)
+  - 2 = Débutant (1 projet court ou formation initiale)
+  - 3 = Intermédiaire (plusieurs projets, autonome en dev)
+  - 4 = Avancé (plusieurs années d'usage, responsabilités de conception)
+  - 5 = Expert (expertise reconnue, leadership technique, certification, formation d'autres, >5 ans)
+
+Tu NE DOIS PAS mettre 3 par défaut partout. Différencie bien les niveaux selon le profil réel.
+
+RÈGLE POUR LES LANGUES :
+Extrais toutes les langues mentionnées (anglais, espagnol, etc.) avec leur niveau CECRL (A1, A2, B1, B2, C1, C2).
+Si le CV mentionne "courant" → C1, "bilingue" → C2, "professionnel" → B2, "scolaire" → B1, "notions" → A2.
+N'invente PAS de langue si elle n'est pas mentionnée.
 
 Structure JSON attendue :
 {
@@ -47,13 +68,14 @@ Structure JSON attendue :
       "period": "Dates", 
       "role": "Rôle", 
       "context": "Contexte du projet", 
-      "phases": "• Action 1\n• Action 2 (Liste à puces avec verbes d'action)", 
+      "phases": "• Action 1\n• Action 2", 
       "tech_stack": ["Tech1", "Tech2"] 
     }
   ],
   "education": [ { "year": "Année", "degree": "Diplôme", "location": "Lieu" } ],
   "certifications": [ { "name": "Nom de la certif" } ],
-  "skills_categories": { "Langages": [ { "name": "Java", "rating": 4 } ] }
+  "skills_categories": { "Langages": [ { "name": "Java", "rating": 4 } ] },
+  "languages": [ { "name": "Anglais", "level": "C1" }, { "name": "Espagnol", "level": "B2" } ]
 }
 
 Texte du CV : ${text}`;

@@ -8,9 +8,9 @@ import { handleImageError } from '../../utils/cv';
 export const ButtonUI = ({ children, onClick, variant = "primary", className = "", disabled = false, title = "" }) => {
   const baseStyle = "px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 justify-center";
   const variants = {
-    primary: "bg-[#2E86C1] text-white hover:bg-[#2573a7] shadow-md",
+    primary: "bg-[#3b72ff] text-white hover:bg-[#ff8054] shadow-md",
     secondary: "bg-slate-100 text-slate-600 hover:bg-slate-200",
-    outline: "border-2 border-[#2E86C1] text-[#2E86C1] hover:bg-blue-50",
+    outline: "border-2 border-[#3b72ff] text-[#3b72ff] hover:bg-[#ff8054] hover:text-white hover:border-[#ff8054]",
     danger: "bg-red-50 text-red-600 hover:bg-red-100 p-2",
     ghost: "text-slate-500 hover:bg-slate-100",
     toolbar: "p-1.5 hover:bg-slate-200 rounded text-slate-600"
@@ -38,7 +38,7 @@ export const InputUI = ({ label, value, onChange, placeholder, maxLength, type =
       value={value || ''} 
       onChange={(e) => onChange(e.target.value)} 
       placeholder={placeholder} 
-      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2E86C1] text-sm text-[#333333] transition-all" 
+      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3b72ff] text-sm text-[#333333] transition-all" 
     />
   </div>
 );
@@ -96,10 +96,10 @@ export const RichTextareaUI = ({ label, value, onChange, placeholder }) => {
       <div className="flex justify-between items-end mb-1 text-left">
         <label className="text-xs font-bold text-[#333333] uppercase block">{String(label)}</label>
       </div>
-      <div className="bg-slate-50 border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2E86C1] transition-all shadow-sm">
+      <div className="bg-slate-50 border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#3b72ff] transition-all shadow-sm">
         <div className="flex flex-col bg-white border-b border-slate-200 text-left">
           <div className="px-3 py-1 bg-blue-50/50 border-b border-slate-50">
-            <p className="text-[9px] font-bold text-[#2E86C1] flex items-center gap-1 uppercase tracking-tight text-left">
+            <p className="text-[9px] font-bold text-[#3b72ff] flex items-center gap-1 uppercase tracking-tight text-left">
               <Sparkles size={10}/> Cliquez sur l'IA, puis faites simplement COLLER dans la fenêtre qui s'ouvre.
             </p>
           </div>
@@ -166,15 +166,15 @@ export const DropZoneUI = ({ onFile, label = "Déposez une image", icon = <Uploa
   const inputRef = useRef(null);
   return (
     <div 
-      className={`border-2 border-dashed rounded-lg p-3 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-1 ${isDragging ? 'border-[#2E86C1] bg-blue-50 scale-[1.02]' : 'border-slate-300 bg-white hover:border-[#2E86C1] hover:bg-slate-50'} ${className}`} 
+      className={`border-2 border-dashed rounded-lg p-3 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-1 ${isDragging ? 'border-[#3b72ff] bg-blue-50 scale-[1.02]' : 'border-slate-300 bg-white hover:border-[#ff8054] hover:bg-slate-50'} ${className}`} 
       onClick={() => inputRef.current.click()} 
       onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }} 
       onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }} 
       onDrop={(e) => { e.preventDefault(); setIsDragging(false); if(e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]); }}
     >
       <input type="file" style={{display: 'none'}} ref={inputRef} accept="image/*" onChange={(e) => { if(e.target.files[0]) onFile(e.target.files[0]); }} />
-      <div className={`transition-colors ${isDragging ? 'text-[#2E86C1]' : 'text-slate-400'}`}>{icon}</div>
-      <span className={`text-[10px] font-bold uppercase transition-colors px-2 leading-tight ${isDragging ? 'text-[#2E86C1]' : 'text-slate-500'}`}>{isDragging ? "Lâchez l'image !" : label}</span>
+      <div className={`transition-colors ${isDragging ? 'text-[#3b72ff]' : 'text-slate-400'}`}>{icon}</div>
+      <span className={`text-[10px] font-bold uppercase transition-colors px-2 leading-tight ${isDragging ? 'text-[#3b72ff]' : 'text-slate-500'}`}>{isDragging ? "Lâchez l'image !" : label}</span>
     </div>
   );
 };
@@ -224,7 +224,7 @@ export const LogoSelectorUI = ({ onSelect, label, suggestions = [] }) => {
       <div className="flex gap-2 mb-3 text-left">
         <div className="relative flex-1 text-left">
           <input 
-            className="w-full pl-8 pr-2 py-2 bg-white border border-slate-300 rounded-lg text-xs text-left focus:ring-2 focus:ring-[#2E86C1] outline-none transition-all" 
+            className="w-full pl-8 pr-2 py-2 bg-white border border-slate-300 rounded-lg text-xs text-left focus:ring-2 focus:ring-[#3b72ff] outline-none transition-all" 
             placeholder="Nom (ex: drupal) ou Domaine (ex: google.com)" 
             value={search} 
             onChange={(e) => setSearch(e.target.value)} 
