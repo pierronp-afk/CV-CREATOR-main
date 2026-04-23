@@ -204,21 +204,26 @@ export const LogoSelectorUI = ({ onSelect, label, suggestions = [] }) => {
       {label && <label className="text-[10px] font-black text-slate-500 uppercase block mb-3 tracking-widest">{String(label)}</label>}
       {suggestions.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
-          {suggestions.map((slug) => (
-            <button 
-              key={slug} 
-              onClick={() => handleSelect(slug)} 
-              className="p-1.5 hover:bg-blue-50 rounded-md transition-all group relative"
-              title={slug}
-            >
-              <img 
-                src={getIconUrl(slug)} 
-                onError={handleImageError} 
-                className="w-5 h-5 object-contain grayscale group-hover:grayscale-0 transition-all opacity-70 group-hover:opacity-100 group-hover:scale-110" 
-                alt={slug} 
-              />
-            </button>
-          ))}
+          {suggestions.map((s) => {
+            const slug = typeof s === 'string' ? s : s.name;
+            const customUrl = typeof s === 'object' ? s.src : null;
+            const src = customUrl || getIconUrl(slug);
+            return (
+              <button 
+                key={slug} 
+                onClick={() => onSelect(s)} 
+                className="p-1.5 hover:bg-blue-50 rounded-md transition-all group relative"
+                title={slug}
+              >
+                <img 
+                  src={src} 
+                  onError={handleImageError} 
+                  className="w-5 h-5 object-contain group-hover:grayscale-0 transition-all opacity-70 group-hover:opacity-100 group-hover:scale-110" 
+                  alt={slug} 
+                />
+              </button>
+            );
+          })}
         </div>
       )}
       <div className="flex gap-2 mb-3 text-left">

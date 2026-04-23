@@ -504,8 +504,10 @@ export default function App() {
                   )}
                   <div className="w-full bg-[#2E86C1] py-3 px-16 mb-1 flex items-center justify-center gap-10 shadow-inner relative z-10 flex-shrink-0 text-left tech-banner">
                     {(cvData.profile.tech_logos || []).map((logo, i) => {
-                      const src = typeof logo === 'string' ? `https://cdn.simpleicons.org/${logo.toLowerCase().replace(/\s+/g, '')}` : logo.src;
-                      const name = typeof logo === 'string' ? logo : logo.name;
+                      const src = typeof logo === 'string' 
+                        ? `https://cdn.simpleicons.org/${logo.toLowerCase().replace(/\s+/g, '')}` 
+                        : (logo.src || logo.url);
+                      const name = typeof logo === 'string' ? logo : (logo.name || logo.slug);
                       return src && src !== "null" ? (
                         <img key={i} src={src} onError={handleImageError} className="h-14 w-auto object-contain brightness-0 invert opacity-95 transition-transform" alt={String(name)} />
                       ) : null;

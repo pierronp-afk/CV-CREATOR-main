@@ -77,18 +77,28 @@ export default function StepProfil({
           label="Technologies (Suggestions Smile)" 
           suggestions={[
             'drupal', 'symfony', 'php', 'react', 'python', 
-            'powerbi', 'snowflake', 'databricks', 'apachenifi', 
-            'amazonaws', 'amazoniotcore', 'amazoniotgreengrass', 'googlecloud', 'azure', 
+            { name: 'powerbi', src: 'https://www.vectorlogo.zone/logos/microsoft_powerbi/microsoft_powerbi-icon.svg' },
+            'snowflake', 'databricks', 'apachenifi', 
+            { name: 'java', src: 'https://www.vectorlogo.zone/logos/java/java-icon.svg' },
+            { name: 'amazonaws', src: 'https://www.vectorlogo.zone/logos/amazon_aws/amazon_aws-icon.svg' },
+            { name: 'googlecloud', src: 'https://www.vectorlogo.zone/logos/google_cloud/google_cloud-icon.svg' },
+            { name: 'azure', src: 'https://www.vectorlogo.zone/logos/microsoft_azure/microsoft_azure-icon.svg' },
             'mysql', 'postgresql', 'docker', 'git', 'javascript', 'tailwindcss',
-            'linux', 'android', 'freertos', 'zephyr', 'buildroot', 'yoctoproject', 'openwrt',
-            'gstreamer', 'opencv', 'qt', 'c', 'cplusplus', 'java', 'springboot', 'terraform'
+            'linux', 'android', 
+            { name: 'freertos', src: 'https://img.icons8.com/color/48/000000/freertos.png' },
+            { name: 'zephyr', src: 'https://img.icons8.com/color/48/000000/zephyr.png' },
+            { name: 'yocto', src: 'https://img.icons8.com/color/48/000000/yocto.png' },
+            'openwrt',
+            'gstreamer', 'opencv', 'qt', 'c', 'cplusplus', 'springboot', 'terraform'
           ]}
         />
         
         <div className="flex flex-wrap gap-2 mt-4 p-4 bg-slate-900 rounded-lg border border-slate-800 shadow-inner text-left">
           {cvData.profile.tech_logos?.map((logo, i) => {
-            const src = typeof logo === 'string' ? `https://cdn.simpleicons.org/${logo.toLowerCase().replace(/\s+/g, '')}` : logo.src;
-            const name = typeof logo === 'string' ? logo : logo.name;
+            const src = typeof logo === 'string' 
+              ? `https://cdn.simpleicons.org/${logo.toLowerCase().replace(/\s+/g, '')}` 
+              : (logo.src || logo.url);
+            const name = typeof logo === 'string' ? logo : (logo.name || logo.slug);
             return (
               <div key={i} className="relative group bg-white/10 p-2 rounded-md border border-white/5 transition-colors hover:bg-white/20 text-left">
                 <img src={src} onError={handleImageError} className="w-6 h-6 object-contain brightness-0 invert text-left" alt={String(name)} />
