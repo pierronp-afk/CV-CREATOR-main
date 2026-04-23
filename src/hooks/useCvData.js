@@ -39,6 +39,11 @@ export const useCvData = () => {
           });
         }
         
+        // Migration for the logo
+        if (parsed.smileLogo === "/favicon.png") {
+          parsed.smileLogo = DEFAULT_CV_DATA.smileLogo;
+        }
+
         return parsed;
       }
     } catch (e) {

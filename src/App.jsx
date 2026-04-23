@@ -489,7 +489,7 @@ export default function App() {
               <div className="pt-36 px-16 pb-0 flex-shrink-0 text-left">
                  <h1 className="uppercase leading-[0.85] mb-8 font-montserrat text-[#333333] text-left">
                    {cvData.isAnonymous 
-                    ? `${String(cvData.profile.firstname?.[0] || '').toUpperCase()}${String(cvData.profile.lastname?.substring(0, 3) || '').toUpperCase()}` 
+                    ? <span className="text-4xl block font-black">{String(cvData.profile.firstname?.[0] || '').toUpperCase()}{String(cvData.profile.lastname?.substring(0, 3) || '').toUpperCase()}</span>
                     : <><span className="text-4xl block font-semibold opacity-90 text-left">{String(cvData.profile.firstname)}</span><span className="text-6xl font-black text-left">{String(cvData.profile.lastname)}</span></>}
                  </h1>
                  <div className="inline-block bg-[#2E86C1] text-white font-bold text-xl px-4 py-1 rounded-sm uppercase mb-6 tracking-wider shadow-sm text-left">{String(cvData.profile.years_experience)} ans d'expérience</div>
@@ -499,7 +499,7 @@ export default function App() {
               <div className="flex-1 flex flex-col justify-start pt-0 pb-12 overflow-hidden text-center text-left">
                   {cvData.profile.summary && cvData.profile.summary.replace(/<[^>]*>/g, '').trim() !== "" && (
                     <div className="px-24 mb-10 relative z-10 flex flex-col items-center text-center text-left">
-                       <div className="text-lg text-[#333333] leading-relaxed italic border-t border-slate-100 pt-8 break-words w-full max-w-[160mm] text-justify" dangerouslySetInnerHTML={{__html: formatTextForPreview(cvData.profile.summary, true)}}></div>
+                       <div className="text-lg text-[#333333] leading-relaxed italic border-t border-slate-100 pt-8 break-words w-full max-w-[160mm] text-justify overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 9, WebkitBoxOrient: 'vertical' }} dangerouslySetInnerHTML={{__html: formatTextForPreview(cvData.profile.summary, true)}}></div>
                     </div>
                   )}
                   <div className="w-full bg-[#2E86C1] py-3 px-16 mb-1 flex items-center justify-center gap-10 shadow-inner relative z-10 flex-shrink-0 text-left tech-banner">

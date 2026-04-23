@@ -43,9 +43,9 @@ export default function StepProfil({
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6 text-left">
-        <div className="p-3 border border-blue-100 bg-blue-50/50 rounded-lg flex flex-col gap-2 text-left">
-          <span className="text-[10px] font-bold text-[#3b72ff] uppercase text-left">Logo Entreprise (Import Manuel)</span>
-          <DropZoneUI onFile={handleSmileLogo} label={cvData.smileLogo ? "Changer Logo" : "Charger Logo"} className="h-24 bg-white text-left" />
+        <div>
+          <InputUI label="Prénom" value={cvData.profile.firstname} onChange={(v) => handleProfileChange('firstname', v)} />
+          <InputUI label="NOM" value={cvData.profile.lastname} onChange={(v) => handleProfileChange('lastname', v)} />
         </div>
         <div className="p-3 border border-slate-200 bg-slate-50 rounded-lg flex flex-col gap-2 text-left">
           <span className="text-[10px] font-bold text-slate-600 uppercase flex items-center justify-between text-left">Photo Profil</span>
@@ -63,10 +63,6 @@ export default function StepProfil({
             {cvData.hidePhoto ? <ToggleLeft className="text-slate-300" size={22}/> : <ToggleRight className="text-[#3b72ff]" size={22}/>}
           </button>
         </div>
-      </div>
-      <div className="grid grid-cols-2 gap-4 text-left">
-        <InputUI label="Prénom" value={cvData.profile.firstname} onChange={(v) => handleProfileChange('firstname', v)} />
-        <InputUI label="NOM" value={cvData.profile.lastname} onChange={(v) => handleProfileChange('lastname', v)} />
       </div>
       <InputUI label="Poste Actuel" value={cvData.profile.current_role} onChange={(v) => handleProfileChange('current_role', v)} />
       <div className="grid grid-cols-2 gap-4 text-left">
