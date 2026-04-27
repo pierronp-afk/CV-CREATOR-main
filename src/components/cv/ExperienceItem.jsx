@@ -17,7 +17,7 @@ const ExperienceItem = ({ exp }) => {
   const hasTech = exp.tech_stack && Array.isArray(exp.tech_stack) && exp.tech_stack.filter(t => t && t.trim() !== "").length > 0;
 
   return (
-    <div className="grid grid-cols-12 gap-6 mb-8 break-inside-avoid print:break-inside-avoid text-left">
+    <div className="grid grid-cols-12 gap-6 mb-8 break-inside-avoid print:break-inside-avoid text-left experience-item">
       <div className="col-span-2 flex flex-col items-center pt-2 text-left">
         <div className="w-16 h-16 rounded-lg border border-slate-200 overflow-hidden flex items-center justify-center bg-white mb-2 p-1 text-center">
           {exp.client_logo && exp.client_logo !== "null" ? (

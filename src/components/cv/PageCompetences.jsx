@@ -11,6 +11,14 @@ import { handleImageError } from '../../utils/cv';
  * CV Page focusing on skills, sectoral knowledge, certifications, and education.
  */
 const PageCompetences = ({ cvData }) => {
+  const skillsCategories = cvData.skills_categories || {};
+  const categoriesCount = Object.keys(skillsCategories).length;
+  const gridColsClass = 
+    categoriesCount <= 1 ? 'grid-cols-1' :
+    categoriesCount === 2 ? 'grid-cols-2' :
+    categoriesCount === 3 ? 'grid-cols-3' :
+    'grid-cols-4';
+
   return (
     <A4Page>
       <CornerTriangle customLogo={cvData.smileLogo} />
@@ -27,19 +35,19 @@ const PageCompetences = ({ cvData }) => {
           <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2">
             <Cpu size={20}/> Mes Compétences
           </h3>
-          <div className="grid grid-cols-3 gap-x-12 gap-y-8">
-            {Object.entries(cvData.skills_categories || {}).map(([cat, skills]) => (
-              <div key={cat} className="break-inside-avoid">
+          <div className={`grid ${gridColsClass} gap-x-6 gap-y-8`}>
+            {Object.entries(skillsCategories).map(([cat, skills]) => (
+              <div key={cat} className="break-inside-avoid skill-category">
                 <h4 className="text-[9px] font-bold text-[#999999] uppercase tracking-widest border-b border-slate-100 pb-1.5 mb-2">
                   {String(cat)}
                 </h4>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {(skills || []).map((skill, i) => (
-                    <div key={i} className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-bold text-[#333333] uppercase truncate pr-2">
+                    <div key={i} className="flex flex-col gap-1">
+                      <span className="text-[10px] font-bold text-[#333333] uppercase leading-tight break-words">
                         {String(skill.name)}
                       </span>
-                      <div className="flex-shrink-0">
+                      <div>
                         <HexagonRating score={skill.rating} />
                       </div>
                     </div>
