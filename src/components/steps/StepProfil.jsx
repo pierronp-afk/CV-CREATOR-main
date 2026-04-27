@@ -3,6 +3,7 @@ import {
   User, X, Shield, Trash2, LayoutTemplate, List, 
   ToggleLeft, ToggleRight, Eye, EyeOff 
 } from 'lucide-react';
+import { BRANDS } from '../../config/brands';
 import { handleImageError } from '../../utils/cv';
 import { InputUI, RichTextareaUI, DropZoneUI, LogoSelectorUI } from '../ui/FormUI';
 
@@ -21,6 +22,38 @@ export default function StepProfil({
     <div className="space-y-6 animate-in slide-in-from-right transition-all text-left">
       <div className="flex items-center gap-3 mb-4 text-[#3b72ff] text-left"><User size={24} /><h2 className="text-lg font-bold uppercase text-left">Profil</h2></div>
       
+      {/* SÉLECTEUR DE MARQUE */}
+      <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+        <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Marque du CV</h3>
+        <div className="grid grid-cols-2 gap-3">
+          {Object.values(BRANDS).map((brand) => {
+            const isActive = cvData.brandId === brand.id;
+            return (
+              <button
+                key={brand.id}
+                onClick={() => updateCvData(prev => ({
+                  ...prev,
+                  brandId: brand.id,
+                  smileLogo: brand.logoTriangle // Reset logo when brand changes
+                }))}
+                className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                  isActive 
+                    ? 'bg-white border-[#3b72ff] shadow-md ring-2 ring-[#3b72ff]/10' 
+                    : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
+                }`}
+              >
+                <div 
+                  className="w-4 h-4 rounded-sm flex-shrink-0" 
+                  style={{ backgroundColor: brand.primary }}
+                />
+                <span className={`text-xs font-bold ${isActive ? 'text-[#3b72ff]' : 'text-slate-600'}`}>
+                  {brand.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
       <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
         <h3 className="text-[10px] font-black uppercase text-blue-400 tracking-widest">Mise en page des documents</h3>
         <button 

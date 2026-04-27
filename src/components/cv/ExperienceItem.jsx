@@ -1,10 +1,14 @@
 import React from 'react';
 import { formatTextForPreview, handleImageError } from '../../utils/cv';
+import { getBrand } from '../../config/brands';
+
 
 /**
  * Individual experience entry with client logo, role, context, and tech stack.
  */
-const ExperienceItem = ({ exp }) => {
+const ExperienceItem = ({ exp, brandId }) => {
+  const brand = getBrand(brandId);
+
   // Helper pour vérifier si une chaîne formatée (pouvant contenir des tags HTML vides) est réellement remplie
   const isContentEmpty = (text) => {
     if (!text) return true;
@@ -23,7 +27,7 @@ const ExperienceItem = ({ exp }) => {
           {exp.client_logo && exp.client_logo !== "null" ? (
             <img src={exp.client_logo} onError={handleImageError} className="max-w-full max-h-full object-contain" alt="Logo Client" />
           ) : (
-            <span className="text-[8px] font-black text-[#2E86C1] uppercase leading-tight px-1 break-words">
+            <span className="text-[8px] font-black uppercase leading-tight px-1 break-words" style={{ color: brand.primary }}>
               {String(exp.client_name || '')}
             </span>
           )}
@@ -32,12 +36,12 @@ const ExperienceItem = ({ exp }) => {
       <div className="col-span-10 border-l border-slate-100 pl-6 pb-4 text-left">
         <div className="flex justify-between items-baseline mb-3">
            <h4 className="text-lg font-bold text-[#333333] uppercase">{String(exp.client_name || '')} <span className="font-normal text-[#666666]">| {String(exp.role || '')}</span></h4>
-           <span className="text-xs font-bold text-[#2E86C1] uppercase">{String(exp.period || '')}</span>
+           <span className="text-xs font-bold uppercase" style={{ color: brand.primary }}>{String(exp.period || '')}</span>
         </div>
         
         {hasContext && (
           <div className="mb-4 text-left">
-             <h5 className="text-[10px] font-bold text-[#2E86C1] uppercase mb-1">Contexte</h5>
+             <h5 className="text-[10px] font-bold uppercase mb-1" style={{ color: brand.primary }}>Contexte</h5>
              <div className="text-sm text-[#333333] leading-relaxed break-words text-justify" dangerouslySetInnerHTML={{__html: formatTextForPreview(exp.context)}}></div>
           </div>
         )}
@@ -55,7 +59,7 @@ const ExperienceItem = ({ exp }) => {
                   <h5 className="text-[10px] font-bold text-[#999999] uppercase mb-1">Environnement</h5>
                   <div className="flex flex-wrap gap-1 text-left">
                     {exp.tech_stack.filter(t => t && t.trim() !== "").map((t, i) => (
-                      <span key={i} className="text-xs font-bold text-[#2E86C1] bg-blue-50 px-2 py-0.5 rounded">{String(t)}</span>
+                      <span key={i} className="text-xs font-bold px-2 py-0.5 rounded" style={{ color: brand.primary, backgroundColor: brand.accentBg }}>{String(t)}</span>
                     ))}
                   </div>
                </div>

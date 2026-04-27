@@ -44,6 +44,11 @@ export const useCvData = () => {
           parsed.smileLogo = DEFAULT_CV_DATA.smileLogo;
         }
 
+        // Migration for brandId
+        if (!parsed.brandId) {
+          parsed.brandId = "smile";
+        }
+
         return parsed;
       }
     } catch (e) {

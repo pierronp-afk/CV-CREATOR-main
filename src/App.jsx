@@ -14,6 +14,8 @@ import {
   handleImageError,
   DEFAULT_CV_DATA
 } from './utils/cv';
+import { getBrand, BRANDS } from './config/brands';
+
 
 import { useCvData } from './hooks/useCvData';
 
@@ -34,14 +36,6 @@ import StepCompetences from './components/steps/StepCompetences';
 import StepExperiences from './components/steps/StepExperiences';
 
 // --- CONFIGURATION & THÈME ---
-const THEME = {
-  primary: "#2E86C1", 
-  secondary: "#006898", 
-  textDark: "#333333", 
-  textGrey: "#666666", 
-  bg: "#FFFFFF"
-};
-
 const getIconUrl = (slug) => `https://cdn.simpleicons.org/${String(slug || '').toLowerCase().replace(/\s+/g, '')}`;
 const getClearbitUrl = (domain) => `https://logo.clearbit.com/${String(domain || '').trim()}`;
 
@@ -108,6 +102,8 @@ export default function App() {
     moveItem,
     history,
   } = useCvData();
+
+  const brand = getBrand(cvData.brandId);
 
   // --- CALCULS DU DOCUMENT ---
   const experiencePages = paginateExperiences(cvData.experiences);
@@ -480,7 +476,7 @@ export default function App() {
             <PreviewErrorBoundary>
             {/* PAGE 1 : PROFIL (Toujours en premier) */}
             <A4Page>
-              <CornerTriangle customLogo={cvData.smileLogo} />
+              <CornerTriangle brandId={cvData.brandId} customLogo={cvData.smileLogo} />
               {!cvData.isAnonymous && !cvData.hidePhoto && cvData.profile.photo && cvData.profile.photo !== "null" && (
                 <div className="absolute top-12 right-12 w-44 h-44 rounded-full overflow-hidden border-4 border-white shadow-xl z-20 bg-white flex items-center justify-center text-left">
                   <img src={cvData.profile.photo} onError={handleImageError} className="max-w-full max-h-full object-contain" alt="Portrait" />
@@ -492,9 +488,9 @@ export default function App() {
                     ? <span className="text-4xl block font-black">{String(cvData.profile.firstname?.[0] || '').toUpperCase()}{String(cvData.profile.lastname?.substring(0, 3) || '').toUpperCase()}</span>
                     : <><span className="text-4xl block font-semibold opacity-90 text-left">{String(cvData.profile.firstname)}</span><span className="text-6xl font-black text-left">{String(cvData.profile.lastname)}</span></>}
                  </h1>
-                 <div className="inline-block bg-[#2E86C1] text-white font-bold text-xl px-4 py-1 rounded-sm uppercase mb-6 tracking-wider shadow-sm text-left">{String(cvData.profile.years_experience)} ans d'expérience</div>
+                 <div className="inline-block text-white font-bold text-xl px-4 py-1 rounded-sm uppercase mb-6 tracking-wider shadow-sm text-left" style={{ backgroundColor: brand.primary }}>{String(cvData.profile.years_experience)} ans d'expérience</div>
                  <h2 className="text-3xl font-black text-[#333333] uppercase mb-1 tracking-wide font-montserrat opacity-90 text-left">{String(cvData.profile.current_role)}</h2>
-                 <div className="text-lg text-[#666666] font-medium uppercase tracking-widest mb-10 border-l-4 border-[#2E86C1] pl-4 text-left">{String(cvData.profile.main_tech)}</div>
+                 <div className="text-lg text-[#666666] font-medium uppercase tracking-widest mb-10 pl-4 text-left" style={{ borderLeft: `4px solid ${brand.primary}` }}>{String(cvData.profile.main_tech)}</div>
               </div>
               <div className="flex-1 flex flex-col justify-start pt-0 pb-12 overflow-hidden text-center text-left">
                   {cvData.profile.summary && cvData.profile.summary.replace(/<[^>]*>/g, '').trim() !== "" && (
@@ -502,7 +498,7 @@ export default function App() {
                        <div className="text-lg text-[#333333] leading-relaxed italic border-t border-slate-100 pt-8 break-words w-full max-w-[160mm] text-justify overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 9, WebkitBoxOrient: 'vertical' }} dangerouslySetInnerHTML={{__html: formatTextForPreview(cvData.profile.summary, true)}}></div>
                     </div>
                   )}
-                  <div className="w-full bg-[#2E86C1] py-3 px-16 mb-1 flex items-center justify-center gap-10 shadow-inner relative z-10 flex-shrink-0 text-left tech-banner">
+                  <div className="w-full py-3 px-16 mb-1 flex items-center justify-center gap-10 shadow-inner relative z-10 flex-shrink-0 text-left tech-banner" style={{ backgroundColor: brand.primary }}>
                     {(cvData.profile.tech_logos || []).map((logo, i) => {
                       const src = typeof logo === 'string' 
                         ? `https://cdn.simpleicons.org/${logo.toLowerCase().replace(/\s+/g, '')}` 
@@ -516,13 +512,13 @@ export default function App() {
                   <div className="flex justify-center gap-12 relative z-10 px-10 flex-shrink-0 mt-2 text-left">
                     {(cvData.soft_skills || []).map((skill, i) => (
                       <div key={i} className="relative w-40 h-44 flex items-center justify-center text-left">
-                        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-[#2E86C1] fill-current drop-shadow-xl text-left hexagon-shape"><polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" /></svg>
+                        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full fill-current drop-shadow-xl text-left hexagon-shape" style={{ color: brand.primary }}><polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" /></svg>
                         <span className="relative z-10 text-white font-bold text-sm uppercase text-center px-4 leading-tight font-montserrat text-left">{String(skill || "Skill")}</span>
                       </div>
                     ))}
                   </div>
               </div>
-              <Footer />
+              <Footer brandId={cvData.brandId} />
             </A4Page>
 
             {/* RENDU DYNAMIQUE SELON L'ORDRE CHOISI */}

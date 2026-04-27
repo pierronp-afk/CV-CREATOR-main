@@ -6,6 +6,8 @@ import HeaderSmall from '../ui/HeaderSmall';
 import HexagonRating from '../ui/HexagonRating';
 import Footer from '../ui/Footer';
 import { handleImageError } from '../../utils/cv';
+import { getBrand } from '../../config/brands';
+
 
 /**
  * CV Page focusing on skills, sectoral knowledge, certifications, and education.
@@ -19,20 +21,23 @@ const PageCompetences = ({ cvData }) => {
     categoriesCount === 3 ? 'grid-cols-3' :
     'grid-cols-4';
 
+  const brand = getBrand(cvData.brandId);
+
   return (
     <A4Page>
-      <CornerTriangle customLogo={cvData.smileLogo} />
+      <CornerTriangle brandId={cvData.brandId} customLogo={cvData.smileLogo} />
       <HeaderSmall 
         isAnonymous={cvData.isAnonymous} 
         profile={cvData.profile} 
         role={cvData.profile.current_role} 
         logo={cvData.smileLogo} 
+        brandId={cvData.brandId}
       />
       <div className="flex flex-col h-full px-12 flex-1 pb-32 overflow-hidden print:overflow-visible">
         
         {/* === BLOC HAUT : COMPÉTENCES (taille naturelle, pas de flex-1) === */}
         <section className="flex-shrink-0 mt-8">
-          <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2" style={{ color: brand.primary }}>
             <Cpu size={20}/> Mes Compétences
           </h3>
           <div className={`grid ${gridColsClass} gap-x-6 gap-y-8`}>
@@ -48,7 +53,7 @@ const PageCompetences = ({ cvData }) => {
                         {String(skill.name)}
                       </span>
                       <div>
-                        <HexagonRating score={skill.rating} />
+                        <HexagonRating score={skill.rating} color={brand.primary} />
                       </div>
                     </div>
                   ))}
@@ -71,12 +76,12 @@ const PageCompetences = ({ cvData }) => {
             <div className="flex flex-col gap-6">
               {cvData.showSecteur && (cvData.connaissances_sectorielles || []).length > 0 && (
                 <section>
-                  <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-3 flex items-center gap-2">
+                  <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-3 flex items-center gap-2" style={{ color: brand.primary }}>
                     <Factory size={20}/> Connaissances Sectorielles
                   </h3>
                   <div className="flex flex-wrap gap-1.5">
                     {(cvData.connaissances_sectorielles || []).map((s, i) => (
-                      <span key={i} className="border-2 border-[#2E86C1] text-[#2E86C1] text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-wider">
+                      <span key={i} className="border-2 text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-wider" style={{ color: brand.primary, borderColor: brand.primary }}>
                         {String(s)}
                       </span>
                     ))}
@@ -85,7 +90,7 @@ const PageCompetences = ({ cvData }) => {
               )}
               {cvData.showCertif && (cvData.certifications || []).length > 0 && (
                 <section>
-                  <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-3 flex items-center gap-2">
+                  <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-3 flex items-center gap-2" style={{ color: brand.primary }}>
                     <Award size={20}/> Certifications
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
@@ -104,7 +109,7 @@ const PageCompetences = ({ cvData }) => {
 
             {/* COLONNE DROITE : Formation + Langues */}
             <section>
-              <h3 className="text-lg font-bold text-[#2E86C1] uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2" style={{ color: brand.primary }}>
                 <GraduationCap size={20}/> Ma Formation
               </h3>
               <div className="space-y-3">
@@ -112,20 +117,20 @@ const PageCompetences = ({ cvData }) => {
                   <div key={i} className="border-l-2 border-slate-100 pl-3">
                     <span className="text-[10px] font-bold text-[#999999] block">{String(edu.year)}</span>
                     <h4 className="text-xs font-bold text-[#333333] uppercase leading-tight">{String(edu.degree)}</h4>
-                    <span className="text-[9px] text-[#2E86C1] font-medium uppercase">{String(edu.location)}</span>
+                    <span className="text-[9px] font-medium uppercase" style={{ color: brand.primary }}>{String(edu.location)}</span>
                   </div>
                 ))}
               </div>
               {(cvData.languages || []).length > 0 && (
                 <div className="mt-5 pt-4 border-t border-slate-100">
-                  <h4 className="text-[11px] font-bold text-[#2E86C1] uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-2" style={{ color: brand.primary }}>
                     <Languages size={14}/> Langues
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {cvData.languages.map((lang, i) => (
                       <div key={i} className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
                         <span className="text-[10px] font-bold text-[#333333] uppercase">{String(lang.name)}</span>
-                        <span className="text-[10px] font-black text-[#2E86C1] bg-white px-1.5 rounded">{String(lang.level)}</span>
+                        <span className="text-[10px] font-black bg-white px-1.5 rounded" style={{ color: brand.primary }}>{String(lang.level)}</span>
                       </div>
                     ))}
                   </div>
@@ -138,7 +143,7 @@ const PageCompetences = ({ cvData }) => {
           <div className="border-t border-slate-200 mt-8 opacity-0"></div>
         </div>
       </div>
-      <Footer />
+      <Footer brandId={cvData.brandId} />
     </A4Page>
   );
 };
