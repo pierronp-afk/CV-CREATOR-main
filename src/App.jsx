@@ -490,7 +490,7 @@ export default function App() {
                  </h1>
                  <div className="inline-block text-white font-bold text-xl px-4 py-1 rounded-sm uppercase mb-6 tracking-wider shadow-sm text-left" style={{ backgroundColor: brand.primary }}>{String(cvData.profile.years_experience)} ans d'expérience</div>
                  <h2 className="text-3xl font-black text-[#333333] uppercase mb-1 tracking-wide font-montserrat opacity-90 text-left">{String(cvData.profile.current_role)}</h2>
-                 <div className="text-lg text-[#666666] font-medium uppercase tracking-widest mb-10 pl-4 text-left" style={{ borderLeft: `4px solid ${brand.primary}` }}>{String(cvData.profile.main_tech)}</div>
+                 <div className="text-lg font-medium uppercase tracking-widest mb-10 pl-4 text-left" style={{ borderLeft: `4px solid ${cvData.brandId === 'smile_v2' ? brand.accent : brand.primary}`, color: cvData.brandId === 'smile_v2' ? brand.accent : '#666666' }}>{String(cvData.profile.main_tech)}</div>
               </div>
               <div className="flex-1 flex flex-col justify-start pt-0 pb-12 overflow-hidden text-center text-left">
                   {cvData.profile.summary && cvData.profile.summary.replace(/<[^>]*>/g, '').trim() !== "" && (
@@ -505,17 +505,21 @@ export default function App() {
                         : (logo.src || logo.url);
                       const name = typeof logo === 'string' ? logo : (logo.name || logo.slug);
                       return src && src !== "null" ? (
-                        <img key={i} src={src} onError={handleImageError} className="h-14 w-auto object-contain brightness-0 invert opacity-95 transition-transform" alt={String(name)} />
+                        <img key={i} src={src} onError={handleImageError} className="h-14 w-auto object-contain opacity-95 transition-transform" style={{ filter: cvData.brandId === 'smile_v2' ? 'none' : 'brightness(0) invert(1)' }} alt={String(name)} />
                       ) : null;
                     })}
                   </div>
-                  <div className="flex justify-center gap-12 relative z-10 px-10 flex-shrink-0 mt-2 text-left">
+                  <div className="flex justify-center gap-8 relative z-10 px-10 flex-shrink-0 mt-2 text-left">
                     {(cvData.soft_skills || []).map((skill, i) => {
                       const isV2 = cvData.brandId === 'smile_v2';
                       return (
-                        <div key={i} className="relative w-40 h-44 flex items-center justify-center text-left">
-                          <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-xl text-left" style={{ fill: isV2 ? 'transparent' : brand.primary, stroke: isV2 ? brand.primary : 'none', strokeWidth: isV2 ? 6 : 0 }}><polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" /></svg>
-                          <span className={`relative z-10 font-bold text-sm uppercase text-center px-4 leading-tight font-montserrat text-left`} style={{ color: isV2 ? brand.primary : 'white' }}>{String(skill || "Skill")}</span>
+                        <div key={i} className="relative flex-shrink-0" style={{ width: 144, height: 144 }}>
+                          <svg viewBox="0 0 100 100" className="absolute inset-0 drop-shadow-xl" style={{ width: 144, height: 144, fill: isV2 ? 'transparent' : brand.primary, stroke: isV2 ? brand.primary : 'none', strokeWidth: isV2 ? 8 : 0 }}>
+                            <polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" />
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center px-4">
+                            <span className="font-bold text-[11px] uppercase text-center leading-tight font-montserrat break-words w-full" style={{ color: isV2 ? brand.primary : 'white' }}>{String(skill || 'Skill')}</span>
+                          </div>
                         </div>
                       );
                     })}
