@@ -514,7 +514,7 @@ export default function App() {
                       const isV2 = cvData.brandId === 'smile_v2';
                       return (
                         <div key={i} className="relative flex-shrink-0" style={{ width: 144, height: 144 }}>
-                          <svg viewBox="0 0 100 100" className="absolute inset-0 drop-shadow-xl" style={{ width: 144, height: 144, fill: isV2 ? 'transparent' : brand.primary, stroke: isV2 ? brand.primary : 'none', strokeWidth: isV2 ? 8 : 0 }}>
+                          <svg viewBox="0 0 100 100" overflow="visible" className="absolute inset-0 drop-shadow-xl" style={{ width: 144, height: 144, fill: isV2 ? 'transparent' : brand.primary, stroke: isV2 ? brand.primary : 'none', strokeWidth: isV2 ? 8 : 0, strokeLinejoin: 'round' }}>
                             <polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" />
                           </svg>
                           <div className="absolute inset-0 flex items-center justify-center px-4">

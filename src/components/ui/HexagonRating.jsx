@@ -15,21 +15,21 @@ const HexagonRating = ({ score, onChange, color = "#2E86C1", variant = 'filled' 
         <svg
           key={i}
           viewBox="0 0 100 100"
+          overflow="visible"
           onClick={onChange ? () => onChange(i) : undefined}
           className={`w-3 h-3 ${onChange ? 'cursor-pointer hover:scale-125 transition-transform' : ''}`}
           style={
             isFilled
               ? {
-                  // filled : actifs colorés, inactifs gris plein
                   fill: isActive ? color : '#E2E8F0',
                   stroke: 'none',
                   strokeWidth: 0
                 }
               : {
-                  // outlined : actifs remplis en color, inactifs vides avec contour gris
                   fill: isActive ? color : 'transparent',
                   stroke: isActive ? 'none' : '#CBD5E1',
-                  strokeWidth: isActive ? 0 : 8
+                  strokeWidth: isActive ? 0 : 8,
+                  strokeLinejoin: 'round'
                 }
           }
         >
