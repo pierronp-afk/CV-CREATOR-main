@@ -26,7 +26,7 @@ const PagesExperiences = ({ cvData, experiencePages }) => {
             brandId={cvData.brandId}
           />
           <div className="flex justify-between items-end border-b border-slate-200 pb-2 mb-8 mt-8 px-12 flex-shrink-0 text-left">
-            <h3 className="text-xl font-bold uppercase tracking-wide font-montserrat" style={{ color: brand.primary }}>
+            <h3 className="text-xl font-bold uppercase tracking-wide font-montserrat" style={{ color: brand.accent }}>
               {pageIndex === 0 ? "Mes dernières expériences" : "Expériences (Suite)"}
             </h3>
             <span className="text-[10px] font-bold text-[#666666] uppercase text-left">Références</span>

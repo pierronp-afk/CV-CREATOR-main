@@ -37,8 +37,9 @@ const PageCompetences = ({ cvData }) => {
         
         {/* === BLOC HAUT : COMPÉTENCES (taille naturelle, pas de flex-1) === */}
         <section className="flex-shrink-0 mt-8">
-          <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2" style={{ color: brand.primary }}>
-            <Cpu size={20}/> Mes Compétences
+          <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2">
+            <Cpu size={20} style={{ color: brand.primary }}/>
+            <span style={{ color: brand.accent }}>Mes Compétences</span>
           </h3>
           <div className={`grid ${gridColsClass} gap-x-6 gap-y-8`}>
             {Object.entries(skillsCategories).map(([cat, skills]) => (
@@ -53,7 +54,7 @@ const PageCompetences = ({ cvData }) => {
                         {String(skill.name)}
                       </span>
                       <div>
-                        <HexagonRating score={skill.rating} color={brand.primary} />
+                        <HexagonRating score={skill.rating} color={brand.primary} variant={cvData.brandId === 'smile_v2' ? 'outlined' : 'filled'} />
                       </div>
                     </div>
                   ))}
@@ -76,8 +77,9 @@ const PageCompetences = ({ cvData }) => {
             <div className="flex flex-col gap-6">
               {cvData.showSecteur && (cvData.connaissances_sectorielles || []).length > 0 && (
                 <section>
-                  <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-3 flex items-center gap-2" style={{ color: brand.primary }}>
-                    <Factory size={20}/> Connaissances Sectorielles
+                  <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-3 flex items-center gap-2">
+                    <Factory size={20} style={{ color: brand.primary }}/>
+                    <span style={{ color: brand.accent }}>Connaissances Sectorielles</span>
                   </h3>
                   <div className="flex flex-wrap gap-1.5">
                     {(cvData.connaissances_sectorielles || []).map((s, i) => (
@@ -90,8 +92,9 @@ const PageCompetences = ({ cvData }) => {
               )}
               {cvData.showCertif && (cvData.certifications || []).length > 0 && (
                 <section>
-                  <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-3 flex items-center gap-2" style={{ color: brand.primary }}>
-                    <Award size={20}/> Certifications
+                  <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-3 flex items-center gap-2">
+                    <Award size={20} style={{ color: brand.primary }}/>
+                    <span style={{ color: brand.accent }}>Certifications</span>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
                     {cvData.certifications.map((c, i) => (
@@ -109,8 +112,9 @@ const PageCompetences = ({ cvData }) => {
 
             {/* COLONNE DROITE : Formation + Langues */}
             <section>
-              <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2" style={{ color: brand.primary }}>
-                <GraduationCap size={20}/> Ma Formation
+              <h3 className="text-lg font-bold uppercase tracking-wide font-montserrat mb-4 flex items-center gap-2">
+                <GraduationCap size={20} style={{ color: brand.primary }}/>
+                <span style={{ color: brand.accent }}>Ma Formation</span>
               </h3>
               <div className="space-y-3">
                 {(cvData.education || []).map((edu, i) => (
@@ -123,8 +127,9 @@ const PageCompetences = ({ cvData }) => {
               </div>
               {(cvData.languages || []).length > 0 && (
                 <div className="mt-5 pt-4 border-t border-slate-100">
-                  <h4 className="text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-2" style={{ color: brand.primary }}>
-                    <Languages size={14}/> Langues
+                  <h4 className="text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <Languages size={14} style={{ color: brand.primary }}/>
+                    <span style={{ color: brand.accent }}>Langues</span>
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {cvData.languages.map((lang, i) => (

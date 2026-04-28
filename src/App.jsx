@@ -510,12 +510,15 @@ export default function App() {
                     })}
                   </div>
                   <div className="flex justify-center gap-12 relative z-10 px-10 flex-shrink-0 mt-2 text-left">
-                    {(cvData.soft_skills || []).map((skill, i) => (
-                      <div key={i} className="relative w-40 h-44 flex items-center justify-center text-left">
-                        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full fill-current drop-shadow-xl text-left hexagon-shape" style={{ color: brand.primary }}><polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" /></svg>
-                        <span className="relative z-10 text-white font-bold text-sm uppercase text-center px-4 leading-tight font-montserrat text-left">{String(skill || "Skill")}</span>
-                      </div>
-                    ))}
+                    {(cvData.soft_skills || []).map((skill, i) => {
+                      const isV2 = cvData.brandId === 'smile_v2';
+                      return (
+                        <div key={i} className="relative w-40 h-44 flex items-center justify-center text-left">
+                          <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-xl text-left" style={{ fill: isV2 ? 'transparent' : brand.primary, stroke: isV2 ? brand.primary : 'none', strokeWidth: isV2 ? 6 : 0 }}><polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" /></svg>
+                          <span className={`relative z-10 font-bold text-sm uppercase text-center px-4 leading-tight font-montserrat text-left`} style={{ color: isV2 ? brand.primary : 'white' }}>{String(skill || "Skill")}</span>
+                        </div>
+                      );
+                    })}
                   </div>
               </div>
               <Footer brandId={cvData.brandId} />
