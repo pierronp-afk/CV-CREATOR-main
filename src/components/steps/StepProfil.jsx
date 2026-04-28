@@ -25,33 +25,27 @@ export default function StepProfil({
       {/* SÉLECTEUR DE MARQUE */}
       <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
         <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Marque du CV</h3>
-        <div className="grid grid-cols-2 gap-3">
-          {Object.values(BRANDS).map((brand) => {
-            const isActive = cvData.brandId === brand.id;
-            return (
-              <button
-                key={brand.id}
-                onClick={() => updateCvData(prev => ({
-                  ...prev,
-                  brandId: brand.id,
-                  smileLogo: brand.logoTriangle // Reset logo when brand changes
-                }))}
-                className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                  isActive 
-                    ? 'bg-white border-[#3b72ff] shadow-md ring-2 ring-[#3b72ff]/10' 
-                    : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
-                }`}
-              >
-                <div 
-                  className="w-4 h-4 rounded-sm flex-shrink-0" 
-                  style={{ backgroundColor: brand.primary }}
-                />
-                <span className={`text-xs font-bold ${isActive ? 'text-[#3b72ff]' : 'text-slate-600'}`}>
-                  {brand.name}
-                </span>
-              </button>
-            );
-          })}
+        <div className="flex items-center gap-2">
+          <div
+            className="w-4 h-4 rounded flex-shrink-0"
+            style={{ backgroundColor: (BRANDS[cvData.brandId] || BRANDS.smile).primary }}
+          />
+          <select
+            value={cvData.brandId}
+            onChange={(e) => {
+              const newBrand = BRANDS[e.target.value];
+              updateCvData(prev => ({
+                ...prev,
+                brandId: newBrand.id,
+                smileLogo: newBrand.logoTriangle
+              }));
+            }}
+            className="flex-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3b72ff] focus:ring-2 focus:ring-[#3b72ff]/10 transition-all bg-white"
+          >
+            {Object.values(BRANDS).map(b => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
         </div>
       </div>
       <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
