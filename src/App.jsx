@@ -509,7 +509,7 @@ export default function App() {
                       ) : null;
                     })}
                   </div>
-                  <div className="flex justify-center gap-8 relative z-10 px-10 flex-shrink-0 mt-2 text-left">
+                  <div className="flex justify-center gap-12 w-full relative z-10 px-16 flex-shrink-0 mt-2 text-left">
                     {(cvData.soft_skills || []).map((skill, i) => {
                       const isV2 = cvData.brandId === 'smile_v2';
                       return (
